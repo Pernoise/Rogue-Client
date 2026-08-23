@@ -6,7 +6,6 @@ plugins {
 
 group = 'com.rogueclient'
 version = '1.0.0'
-<<<<<<< HEAD
 
 java {
     toolchain {
@@ -17,8 +16,7 @@ java {
 tasks.withType(JavaCompile).configureEach {
     options.release = 21
 }
-=======
->>>>>>> d9fb203 (Fix javafxplugin version and update CenterPanel)
+
 
 repositories {
     mavenCentral()
