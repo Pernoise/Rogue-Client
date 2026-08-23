@@ -211,10 +211,6 @@ public class Main extends Application {
                 TrayManager.init(stage);
             }
 
-            if (FirstLaunchDialog.isFirstLaunch()) {
-                Platform.runLater(() -> FirstLaunchDialog.show());
-            }
-
             // Background check so a slow/dead network never delays the launcher opening.
             Thread updateCheck = new Thread(() -> {
                 UpdateManager.UpdateInfo info = UpdateManager.checkForUpdate();
