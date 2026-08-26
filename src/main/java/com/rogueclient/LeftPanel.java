@@ -28,7 +28,7 @@ public class LeftPanel extends VBox {
         this.settingsManager = settingsManager;
 
         setPrefWidth(68);
-        setStyle("-fx-background-color: #0f0f0f; -fx-border-color: #1a1a1a; -fx-border-width: 0 1 0 0; -fx-background-radius: 0 0 0 12; -fx-border-radius: 0 0 0 12;");
+        setStyle(panelStyle());
         setAlignment(Pos.TOP_CENTER);
         setPadding(new Insets(14, 0, 14, 0));
         setSpacing(6);
@@ -51,6 +51,16 @@ public class LeftPanel extends VBox {
         VBox website = createIcon("icons/globe.png", "Website", false, "https://rogueclient.rogueclient.abrdns.com/#home", false, false);
         getChildren().addAll(logo, account, settings, logsBtn, launcherFolder, spacer, accountWidget, discord, website);
 
+    }
+
+    private String panelStyle() {
+        String bg = ThemeManager.getInstance().leftPanelColor;
+        return "-fx-background-color: " + bg + "; -fx-border-color: #1a1a1a; -fx-border-width: 0 1 0 0; -fx-background-radius: 0 0 0 12; -fx-border-radius: 0 0 0 12;";
+    }
+
+    /** Re-applies the current theme's colors to this panel without rebuilding it. */
+    public void refreshTheme() {
+        setStyle(panelStyle());
     }
 
     public void refreshAccountWidget() {
@@ -152,7 +162,7 @@ public class LeftPanel extends VBox {
         popup.initModality(Modality.APPLICATION_MODAL);
 
         AuthPanel authPanel = new AuthPanel(accountManager);
-        authPanel.setStyle("-fx-background-color: #0f0f0f;");
+        authPanel.setStyle("-fx-background-color: " + ThemeManager.getInstance().backgroundColor + ";");
 
         RogueWindowChrome.apply(popup, "LOGIN", authPanel, 400, 500, this::refreshAccountWidget);
         popup.centerOnScreen();
@@ -168,7 +178,7 @@ public class LeftPanel extends VBox {
         popup.initModality(Modality.APPLICATION_MODAL);
 
         SettingsPanel settingsPanel = new SettingsPanel(settingsManager);
-        settingsPanel.setStyle("-fx-background-color: #0f0f0f;");
+        settingsPanel.setStyle("-fx-background-color: " + ThemeManager.getInstance().backgroundColor + ";");
 
         RogueWindowChrome.apply(popup, "SETTINGS", settingsPanel, 520, 580, null);
         popup.centerOnScreen();

@@ -10,3 +10,4 @@ config/
 local/
 fabricloader.log
 *.log.gz
+Appimagetools/*.AppImage

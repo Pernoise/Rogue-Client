@@ -36,8 +36,7 @@ public class SettingsPanel extends VBox {
     public SettingsPanel(SettingsManager settings) {
         this.settings = settings;
 
-        setStyle("-fx-background-color: #0f0f0f;");
-        setPrefWidth(480);
+        setStyle("-fx-background-color: " + ThemeManager.getInstance().backgroundColor + ";");
         setPrefHeight(520);
         setPadding(new Insets(24));
         setSpacing(16);
@@ -50,63 +49,111 @@ public class SettingsPanel extends VBox {
 
         Button launchTab  = tabButton("Launch",  true);
         Button discordTab = tabButton("Discord", false);
+        Button styleTab   = tabButton("Style",   false);
         Button aboutTab   = tabButton("About",   false);
         Button devToolsTab = tabButton("DevTools", false);
-        tabBar.getChildren().addAll(launchTab, discordTab, aboutTab, devToolsTab);
+        tabBar.getChildren().addAll(launchTab, discordTab, styleTab, aboutTab, devToolsTab);
 
         VBox launchPanel  = buildLaunchPanel();
         VBox discordPanel = buildDiscordPanel();
+        VBox stylePanel   = buildStylePanel();
         VBox aboutPanel   = buildAboutPanel();
         VBox devtoolsPanel = buildDevtoolsPanel();
 
         discordPanel.setVisible(false); discordPanel.setManaged(false);
+        stylePanel.setVisible(false);   stylePanel.setManaged(false);
         aboutPanel.setVisible(false);   aboutPanel.setManaged(false);
         devtoolsPanel.setVisible(false);
         devtoolsPanel.setManaged(false);
 
-        StackPane content = new StackPane(launchPanel, discordPanel, aboutPanel, devtoolsPanel);
+        StackPane content = new StackPane(launchPanel, discordPanel, stylePanel, aboutPanel, devtoolsPanel);
         VBox.setVgrow(content, Priority.ALWAYS);
 
-        launchTab.setOnAction(e -> {
-            launchPanel.setVisible(true);   launchPanel.setManaged(true);
-            discordPanel.setVisible(false); discordPanel.setManaged(false);
-            aboutPanel.setVisible(false);   aboutPanel.setManaged(false);
-            devtoolsPanel.setVisible(false);
-            devtoolsPanel.setManaged(false);
-            setActive(launchTab, discordTab, aboutTab, devToolsTab);
-        });
+        Button[] allTabs = { launchTab, discordTab, styleTab, aboutTab, devToolsTab };
+        VBox[] allPanels = { launchPanel, discordPanel, stylePanel, aboutPanel, devtoolsPanel };
 
-        discordTab.setOnAction(e -> {
-            discordPanel.setVisible(true);  discordPanel.setManaged(true);
-            launchPanel.setVisible(false);  launchPanel.setManaged(false);
-            aboutPanel.setVisible(false);   aboutPanel.setManaged(false);
-            devtoolsPanel.setVisible(false);
-            devtoolsPanel.setManaged(false);
-            setActive(discordTab, launchTab, aboutTab, devToolsTab);
-        });
-
-        aboutTab.setOnAction(e -> {
-            aboutPanel.setVisible(true);    aboutPanel.setManaged(true);
-            launchPanel.setVisible(false);  launchPanel.setManaged(false);
-            discordPanel.setVisible(false); discordPanel.setManaged(false);
-            devtoolsPanel.setVisible(false);
-            devtoolsPanel.setManaged(false);
-            setActive(aboutTab, launchTab, discordTab, devToolsTab);
-        });
-        devToolsTab.setOnAction(e -> {
-            aboutPanel.setVisible(false);
-            aboutPanel.setManaged(false);
-            launchPanel.setVisible(false);
-            launchPanel.setManaged(false);
-            discordPanel.setVisible(false);
-            discordPanel.setManaged(false);
-            devtoolsPanel.setVisible(true);
-            devtoolsPanel.setManaged(true);
-            setActive(devToolsTab, launchTab, discordTab, aboutTab);
-        });
-
+        launchTab.setOnAction(e -> showOnly(launchPanel, allPanels, launchTab, allTabs));
+        discordTab.setOnAction(e -> showOnly(discordPanel, allPanels, discordTab, allTabs));
+        styleTab.setOnAction(e -> showOnly(stylePanel, allPanels, styleTab, allTabs));
+        aboutTab.setOnAction(e -> showOnly(aboutPanel, allPanels, aboutTab, allTabs));
+        devToolsTab.setOnAction(e -> showOnly(devtoolsPanel, allPanels, devToolsTab, allTabs));
 
         getChildren().addAll(title, tabBar, content);
+    }
+
+    private void showOnly(VBox toShow, VBox[] allPanels, Button activeTab, Button[] allTabs) {
+        for (VBox p : allPanels) {
+            boolean match = (p == toShow);
+            p.setVisible(match);
+            p.setManaged(match);
+        }
+        setActive(activeTab, java.util.Arrays.stream(allTabs).filter(b -> b != activeTab).toArray(Button[]::new));
+    }
+
+    private VBox buildStylePanel() {
+        VBox panel = new VBox(16);
+        panel.setPadding(new Insets(16, 0, 0, 0));
+
+        panel.getChildren().add(sectionLabel("Launcher Appearance"));
+
+        Label desc = new Label("Customize the launcher's colors, fonts, and headline size. " +
+            "Changes are previewed live and only take effect once saved.");
+        desc.setWrapText(true);
+        desc.setStyle("-fx-text-fill: #888888; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        panel.getChildren().add(desc);
+
+        Button openBtn = new Button("Open Customization Window");
+        openBtn.setStyle(secondaryBtnStyle());
+        openBtn.setOnAction(e -> ThemeCustomizationWindow.open());
+        panel.getChildren().add(openBtn);
+
+        panel.getChildren().add(sectionLabel("Custom Fonts"));
+        Label fontDesc = new Label("Drop .ttf/.otf/.woff files into:\n" +
+            FontManager.getHeadlineDir() + "\n" + FontManager.getTextDir() +
+            "\nThey'll show up as selectable fonts inside the customization window.");
+        fontDesc.setWrapText(true);
+        fontDesc.setStyle("-fx-text-fill: #888888; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        panel.getChildren().add(fontDesc);
+
+        Button openFolderBtn = new Button("Open Fonts Folder");
+        openFolderBtn.setStyle(secondaryBtnStyle());
+        openFolderBtn.setOnAction(e -> {
+            FontManager.ensureFoldersAndLoad();
+            openInFileManager(FontManager.getHeadlineDir().getParent());
+        });
+        panel.getChildren().add(openFolderBtn);
+
+        panel.getChildren().add(sectionLabel("Reset"));
+        Button resetBtn = new Button("Reset Appearance to Default");
+        resetBtn.setStyle(secondaryBtnStyle());
+        resetBtn.setOnAction(e -> {
+            ThemeManager tm = ThemeManager.getInstance();
+            tm.resetToDefaults();
+            tm.applyAndSave();
+        });
+        panel.getChildren().add(resetBtn);
+
+        return panel;
+    }
+
+    private void openInFileManager(Path path) {
+        try {
+            if (Files.exists(path) == false) {
+                Files.createDirectories(path);
+            }
+            String os = System.getProperty("os.name").toLowerCase();
+            ProcessBuilder pb;
+            if (os.contains("win")) {
+                pb = new ProcessBuilder("explorer", path.toString());
+            } else if (os.contains("mac")) {
+                pb = new ProcessBuilder("open", path.toString());
+            } else {
+                pb = new ProcessBuilder("xdg-open", path.toString());
+            }
+            pb.start();
+        } catch (Exception e) {
+            System.out.println("Could not open folder: " + e.getMessage());
+        }
     }
 
     private VBox buildLaunchPanel() {

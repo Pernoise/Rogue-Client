@@ -7,14 +7,17 @@ import javafx.scene.layout.VBox;
 
 public class NewsPanel extends VBox {
 
+    private Label titleLabel;
+
     public NewsPanel() {
         setPrefWidth(300);
-        setStyle("-fx-border-color: #161616; -fx-border-width: 0 0 0 1;");
+        setStyle(panelStyle());
         setPadding(new Insets(20, 20, 20, 20));
         setSpacing(10);
 
         Label title = new Label("NEWS");
-        title.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 9; -fx-font-family: 'JetBrains Mono';");
+        titleLabel = title;
+        title.setStyle(titleStyle());
 
         VBox cards = new VBox(8);
         cards.getChildren().addAll(
@@ -66,6 +69,21 @@ public class NewsPanel extends VBox {
         VBox.setVgrow(scroll, javafx.scene.layout.Priority.ALWAYS);
 
         getChildren().addAll(title, scroll);
+    }
+
+    private String panelStyle() {
+        String bg = ThemeManager.getInstance().newsPanelColor;
+        return "-fx-background-color: " + bg + "; -fx-border-color: #161616; -fx-border-width: 0 0 0 1;";
+    }
+
+    private String titleStyle() {
+        return "-fx-text-fill: " + ThemeManager.getInstance().textColor + "; -fx-font-size: 9; -fx-font-family: '" + ThemeManager.getInstance().textFontFamilyOrDefault() + "';";
+    }
+
+    /** Re-applies the current theme's colors to this panel without rebuilding it. */
+    public void refreshTheme() {
+        setStyle(panelStyle());
+        if (titleLabel != null) titleLabel.setStyle(titleStyle());
     }
 
     private VBox newsCard(String date, String text) {

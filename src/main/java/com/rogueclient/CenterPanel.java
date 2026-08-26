@@ -37,9 +37,12 @@ public class CenterPanel extends VBox {
     private Button selectBtn;
     private HBox playRow;
     private Button playBtn;
+    private Button versionBtn;
     private VBox dropdownContent;
     private ScrollPane scrollPane;
     private ImageView loaderIcon;
+    private Label headlineLabel;
+    private Label quoteLabel;
 
     private static final String[] VERSIONS = {
         "26.2", "26.1.2", "26.1.1", "26.1",
@@ -63,18 +66,15 @@ public class CenterPanel extends VBox {
         setAlignment(Pos.CENTER);
         setPadding(new Insets(28, 36, 22, 36));
         setSpacing(6);
+        setStyle(panelStyle());
 
         Label name = new Label("Rogue Client");
-        Font customFont = Font.loadFont(getClass().getResourceAsStream("/fonts/gondens-demo/Gondens DEMO.otf"), 64);
-        if (customFont != null) {
-            name.setFont(customFont);
-            name.setStyle("-fx-text-fill: #ffffff; -fx-opacity: 0.88;");
-        } else {
-            name.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 64; -fx-font-family: 'JetBrains Mono'; -fx-font-weight: bold; -fx-opacity: 0.88;");
-        }
+        headlineLabel = name;
+        applyHeadlineStyle(name);
 
         Label quote = new Label(loadRandomQuote());
-        quote.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono'; -fx-font-style: italic; -fx-font-weight: bold;");
+        quoteLabel = quote;
+        applyQuoteStyle(quote);
         quote.setWrapText(true);
         quote.setMaxWidth(420);
         quote.setAlignment(Pos.CENTER);
@@ -105,7 +105,7 @@ public class CenterPanel extends VBox {
         playBtn.setOnMouseExited(e -> playBtn.setStyle(playBtnStyle()));
         playBtn.setOnAction(e -> handlePlay(playBtn));
 
-        Button versionBtn = new Button("v");
+        versionBtn = new Button("v");
         versionBtn.setStyle(versionBtnStyle());
         versionBtn.setOnMouseEntered(e -> versionBtn.setStyle(versionBtnHoverStyle()));
         versionBtn.setOnMouseExited(e -> versionBtn.setStyle(versionBtnStyle()));
@@ -278,23 +278,26 @@ public class CenterPanel extends VBox {
     }
 
     private String playBtnStyle() {
-        return "-fx-background-color: #0f0f0f; -fx-text-fill: #ffffff; " +
-            "-fx-font-size: 13; -fx-font-weight: bold; -fx-font-family: 'JetBrains Mono'; " +
+        ThemeManager t = ThemeManager.getInstance();
+        return "-fx-background-color: " + t.buttonColor + "; -fx-text-fill: " + t.buttonTextColor + "; " +
+            "-fx-font-size: 13; -fx-font-weight: bold; -fx-font-family: '" + t.textFontFamilyOrDefault() + "'; " +
             "-fx-border-color: #1a1a1a; -fx-border-width: 1; " +
             "-fx-background-radius: 8; -fx-border-radius: 8; " +
             "-fx-cursor: hand; -fx-padding: 16 24; -fx-opacity: 0.88;";
     }
 
     private String playBtnHoverStyle() {
-        return "-fx-background-color: #161616; -fx-text-fill: #ffffff; " +
-            "-fx-font-size: 13; -fx-font-weight: bold; -fx-font-family: 'JetBrains Mono'; " +
+        ThemeManager t = ThemeManager.getInstance();
+        return "-fx-background-color: " + t.buttonHoverColor + "; -fx-text-fill: " + t.buttonTextColor + "; " +
+            "-fx-font-size: 13; -fx-font-weight: bold; -fx-font-family: '" + t.textFontFamilyOrDefault() + "'; " +
             "-fx-border-color: #1a1a1a; -fx-border-width: 1; " +
             "-fx-background-radius: 8; -fx-border-radius: 8; " +
             "-fx-cursor: hand; -fx-padding: 16 24; -fx-opacity: 0.88;";
     }
 
     private String versionBtnStyle() {
-        return "-fx-background-color: #0f0f0f; -fx-text-fill: #ffffff; " +
+        ThemeManager t = ThemeManager.getInstance();
+        return "-fx-background-color: " + t.buttonColor + "; -fx-text-fill: " + t.buttonTextColor + "; " +
             "-fx-font-size: 13; -fx-font-weight: bold; " +
             "-fx-border-color: #1a1a1a; -fx-border-width: 1; " +
             "-fx-border-radius: 8; -fx-background-radius: 8; " +
@@ -302,11 +305,49 @@ public class CenterPanel extends VBox {
     }
 
     private String versionBtnHoverStyle() {
-        return "-fx-background-color: #161616; -fx-text-fill: #ffffff; " +
+        ThemeManager t = ThemeManager.getInstance();
+        return "-fx-background-color: " + t.buttonHoverColor + "; -fx-text-fill: " + t.buttonTextColor + "; " +
             "-fx-font-size: 13; -fx-font-weight: bold; " +
             "-fx-border-color: #1a1a1a; -fx-border-width: 1; " +
             "-fx-border-radius: 8; -fx-background-radius: 8; " +
             "-fx-cursor: hand; -fx-min-width: 40; -fx-padding: 16 10;";
+    }
+
+    private String panelStyle() {
+        return "-fx-background-color: " + ThemeManager.getInstance().centerPanelColor + ";";
+    }
+
+    private void applyHeadlineStyle(Label label) {
+        ThemeManager t = ThemeManager.getInstance();
+        Font customFont = null;
+        if (t.headlineFontFamily != null && !t.headlineFontFamily.isEmpty()) {
+            customFont = Font.font(t.headlineFontFamily, t.headlineFontSize);
+        } else {
+            customFont = Font.loadFont(getClass().getResourceAsStream("/fonts/gondens-demo/Gondens DEMO.otf"), t.headlineFontSize);
+        }
+        if (customFont != null) {
+            label.setFont(customFont);
+            label.setStyle("-fx-text-fill: " + t.headlineColor + "; -fx-opacity: 0.88;");
+        } else {
+            label.setStyle("-fx-text-fill: " + t.headlineColor + "; -fx-font-size: " + t.headlineFontSize +
+                "; -fx-font-family: 'JetBrains Mono'; -fx-font-weight: bold; -fx-opacity: 0.88;");
+        }
+    }
+
+    private void applyQuoteStyle(Label label) {
+        ThemeManager t = ThemeManager.getInstance();
+        label.setStyle("-fx-text-fill: " + t.textColor + "; -fx-font-size: 11; -fx-font-family: '" +
+            t.textFontFamilyOrDefault() + "'; -fx-font-style: italic; -fx-font-weight: bold;");
+    }
+
+    /** Re-applies the current theme's colors/fonts to this panel without rebuilding it. */
+    public void refreshTheme() {
+        setStyle(panelStyle());
+        if (headlineLabel != null) applyHeadlineStyle(headlineLabel);
+        if (quoteLabel != null) applyQuoteStyle(quoteLabel);
+        if (playBtn != null) playBtn.setStyle(playBtnStyle());
+        if (selectBtn != null) selectBtn.setStyle(playBtnStyle());
+        if (versionBtn != null) versionBtn.setStyle(versionBtnStyle());
     }
 
     private void setLoaderIcon(ImageView iv, boolean fabric) {

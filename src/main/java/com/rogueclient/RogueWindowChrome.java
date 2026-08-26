@@ -26,24 +26,21 @@ public class RogueWindowChrome {
      */
     public static void apply(Stage stage, String title, Region content, double width, double height, Runnable onClose) {
         stage.initStyle(StageStyle.TRANSPARENT);
+        ThemeManager theme = ThemeManager.getInstance();
 
         Label titleLabel = new Label(title);
-        titleLabel.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        titleLabel.setStyle("-fx-text-fill: " + theme.textColor + "; -fx-font-size: 11; -fx-font-family: '" + theme.textFontFamilyOrDefault() + "';");
 
         Button minimizeBtn = new Button("-");
-        minimizeBtn.setStyle(titleBtnStyle());
-        minimizeBtn.setOnMouseEntered(e -> minimizeBtn.setStyle(titleBtnHoverStyle()));
-        minimizeBtn.setOnMouseExited(e -> minimizeBtn.setStyle(titleBtnStyle()));
+        minimizeBtn.setStyle(titleBtnStyle(theme));
+        minimizeBtn.setOnMouseEntered(e -> minimizeBtn.setStyle(titleBtnHoverStyle(theme)));
+        minimizeBtn.setOnMouseExited(e -> minimizeBtn.setStyle(titleBtnStyle(theme)));
         minimizeBtn.setOnAction(e -> stage.setIconified(true));
 
         Button closeBtn = new Button("x");
-        closeBtn.setStyle(titleBtnStyle());
-        closeBtn.setOnMouseEntered(e -> closeBtn.setStyle(closeBtnHoverStyle()));
-        closeBtn.setOnMouseExited(e -> closeBtn.setStyle(titleBtnStyle()));
-        closeBtn.setOnAction(e -> {
-            stage.close();
-            if (onClose != null) onClose.run();
-        });
+        closeBtn.setStyle(titleBtnStyle(theme));
+        closeBtn.setOnMouseEntered(e -> closeBtn.setStyle(closeBtnHoverStyle(theme)));
+        closeBtn.setOnMouseExited(e -> closeBtn.setStyle(titleBtnStyle(theme)));
 
         HBox spacer = new HBox();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -52,7 +49,7 @@ public class RogueWindowChrome {
         titleBar.setMaxWidth(Double.MAX_VALUE);
         titleBar.setAlignment(Pos.CENTER_LEFT);
         titleBar.setPadding(new Insets(6, 8, 6, 12));
-        titleBar.setStyle("-fx-background-color: #080404; -fx-background-radius: 12 12 0 0;");
+        titleBar.setStyle("-fx-background-color: " + theme.backgroundColor + "; -fx-background-radius: 12 12 0 0;");
 
         double[] offset = new double[2];
         titleBar.setOnMousePressed(e -> { offset[0] = e.getSceneX(); offset[1] = e.getSceneY(); });
@@ -65,7 +62,23 @@ public class RogueWindowChrome {
 
         VBox wrapper = new VBox(0, titleBar, content);
         VBox.setVgrow(content, Priority.ALWAYS);
-        wrapper.setStyle("-fx-background-color: #080404; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #1a1a1a; -fx-border-width: 1;");
+        wrapper.setStyle("-fx-background-color: " + theme.backgroundColor + "; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #1a1a1a; -fx-border-width: 1;");
+
+        // Live-restyle this popup's chrome if the theme is saved while it's still open.
+        Runnable themeListener = () -> {
+            ThemeManager t = ThemeManager.getInstance();
+            titleLabel.setStyle("-fx-text-fill: " + t.textColor + "; -fx-font-size: 11; -fx-font-family: '" + t.textFontFamilyOrDefault() + "';");
+            titleBar.setStyle("-fx-background-color: " + t.backgroundColor + "; -fx-background-radius: 12 12 0 0;");
+            wrapper.setStyle("-fx-background-color: " + t.backgroundColor + "; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #1a1a1a; -fx-border-width: 1;");
+        };
+        theme.addListener(themeListener);
+
+        closeBtn.setOnAction(e -> {
+            theme.removeListener(themeListener);
+            stage.close();
+            if (onClose != null) onClose.run();
+        });
+        stage.setOnHidden(e -> theme.removeListener(themeListener));
 
         Scene scene = new Scene(wrapper, width, height);
         scene.setFill(Color.TRANSPARENT);
@@ -75,15 +88,15 @@ public class RogueWindowChrome {
         stage.setMinHeight(height);
     }
 
-    private static String titleBtnStyle() {
-        return "-fx-background-color: transparent; -fx-text-fill: #ffffff; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
+    private static String titleBtnStyle(ThemeManager theme) {
+        return "-fx-background-color: transparent; -fx-text-fill: " + theme.textColor + "; -fx-font-family: '" + theme.textFontFamilyOrDefault() + "'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
     }
 
-    private static String titleBtnHoverStyle() {
-        return "-fx-background-color: #1a1a1a; -fx-text-fill: #ffffff; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
+    private static String titleBtnHoverStyle(ThemeManager theme) {
+        return "-fx-background-color: " + theme.buttonHoverColor + "; -fx-text-fill: " + theme.textColor + "; -fx-font-family: '" + theme.textFontFamilyOrDefault() + "'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
     }
 
-    private static String closeBtnHoverStyle() {
-        return "-fx-background-color: #3a0000; -fx-text-fill: #ff4444; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
+    private static String closeBtnHoverStyle(ThemeManager theme) {
+        return "-fx-background-color: #3a0000; -fx-text-fill: #ff4444; -fx-font-family: '" + theme.textFontFamilyOrDefault() + "'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
     }
 }
