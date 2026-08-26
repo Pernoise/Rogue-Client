@@ -31,10 +31,7 @@ public class LogViewerWindow {
         ScrollPane logScroll = new ScrollPane(logLines);
         logScroll.getStyleClass().add("rogue-scroll");
         logScroll.setFitToWidth(true);
-        logScroll.setStyle(
-            "-fx-background: #080404; -fx-background-color: #080404; " +
-            "-fx-border-color: #1a1a1a; -fx-border-radius: 6; -fx-background-radius: 6;"
-        );
+        logScroll.setStyle(logScrollStyle());
         VBox.setVgrow(logScroll, Priority.ALWAYS);
 
         Button launcherTab = new Button("Launcher Log");
@@ -104,7 +101,21 @@ public class LogViewerWindow {
 
         VBox root = new VBox(12, tabRow, logScroll, btnRow);
         root.setPadding(new Insets(20));
-        root.setStyle("-fx-background-color: #080404;");
+        root.setStyle(rootStyle());
+
+        // Re-skin this window live if the theme is saved while it's still open.
+        Runnable themeListener = () -> {
+            logScroll.setStyle(logScrollStyle());
+            root.setStyle(rootStyle());
+            copyBtn.setStyle(secondaryBtnStyle());
+            clearBtn.setStyle(secondaryBtnStyle());
+            openFolderBtn.setStyle(secondaryBtnStyle());
+            closeBtn.setStyle(secondaryBtnStyle());
+            setActiveTab(currentPath[0] == LAUNCHER_LOG ? launcherTab : mcTab,
+                         currentPath[0] == LAUNCHER_LOG ? mcTab : launcherTab);
+        };
+        ThemeManager.getInstance().addListener(themeListener);
+        stage.setOnHidden(e -> ThemeManager.getInstance().removeListener(themeListener));
 
         RogueWindowChrome.apply(stage, "LOGS", root, 860, 620, null);
 
@@ -181,20 +192,33 @@ public class LogViewerWindow {
     }
 
     private static String tabBtnStyle() {
-        return "-fx-background-color: #0f0f0f; -fx-text-fill: #888888; -fx-font-family: 'JetBrains Mono'; " +
+        ThemeManager t = ThemeManager.getInstance();
+        return "-fx-background-color: " + t.leftPanelColor + "; -fx-text-fill: " + t.secondaryTextColor + "; -fx-font-family: '" + t.textFontFamilyOrDefault() + "'; " +
             "-fx-font-size: 12; -fx-border-color: #1a1a1a; -fx-border-radius: 6; -fx-background-radius: 6; " +
             "-fx-cursor: hand; -fx-padding: 8 16;";
     }
 
     private static String tabBtnActiveStyle() {
-        return "-fx-background-color: #161616; -fx-text-fill: #ffffff; -fx-font-family: 'JetBrains Mono'; " +
+        ThemeManager t = ThemeManager.getInstance();
+        return "-fx-background-color: " + t.buttonColor + "; -fx-text-fill: " + t.buttonTextColor + "; -fx-font-family: '" + t.textFontFamilyOrDefault() + "'; " +
             "-fx-font-size: 12; -fx-border-color: #1a1a1a; -fx-border-radius: 6; -fx-background-radius: 6; " +
             "-fx-cursor: hand; -fx-padding: 8 16;";
     }
 
     private static String secondaryBtnStyle() {
-        return "-fx-background-color: #141414; -fx-text-fill: #ffffff; -fx-font-family: 'JetBrains Mono'; " +
+        ThemeManager t = ThemeManager.getInstance();
+        return "-fx-background-color: " + t.buttonColor + "; -fx-text-fill: " + t.buttonTextColor + "; -fx-font-family: '" + t.textFontFamilyOrDefault() + "'; " +
             "-fx-font-size: 12; -fx-border-color: #222222; -fx-border-radius: 6; -fx-background-radius: 6; " +
             "-fx-cursor: hand; -fx-padding: 8 16;";
+    }
+
+    private static String logScrollStyle() {
+        ThemeManager t = ThemeManager.getInstance();
+        return "-fx-background: " + t.centerPanelColor + "; -fx-background-color: " + t.centerPanelColor + "; " +
+            "-fx-border-color: #1a1a1a; -fx-border-radius: 6; -fx-background-radius: 6;";
+    }
+
+    private static String rootStyle() {
+        return "-fx-background-color: " + ThemeManager.getInstance().centerPanelColor + ";";
     }
 }
