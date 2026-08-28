@@ -162,7 +162,7 @@ public class LeftPanel extends VBox {
         popup.initModality(Modality.APPLICATION_MODAL);
 
         AuthPanel authPanel = new AuthPanel(accountManager);
-        authPanel.setStyle("-fx-background-color: " + ThemeManager.getInstance().backgroundColor + ";");
+        authPanel.setStyle("-fx-background-color: #0f0f0f;");
 
         RogueWindowChrome.apply(popup, "LOGIN", authPanel, 400, 500, this::refreshAccountWidget);
         popup.centerOnScreen();
@@ -178,7 +178,7 @@ public class LeftPanel extends VBox {
         popup.initModality(Modality.APPLICATION_MODAL);
 
         SettingsPanel settingsPanel = new SettingsPanel(settingsManager);
-        settingsPanel.setStyle("-fx-background-color: " + ThemeManager.getInstance().backgroundColor + ";");
+        settingsPanel.setStyle("-fx-background-color: #0f0f0f;");
 
         RogueWindowChrome.apply(popup, "SETTINGS", settingsPanel, 520, 580, null);
         popup.centerOnScreen();

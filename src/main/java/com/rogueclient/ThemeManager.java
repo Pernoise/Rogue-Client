@@ -37,7 +37,7 @@ public class ThemeManager {
     }
 
     // ---- Colors (hex strings, e.g. "#0f0f0f") ----
-    public String backgroundColor   = "#080404";
+    public String titleBarColor     = "#080404";
     public String leftPanelColor    = "#0f0f0f";
     public String centerPanelColor  = "#080404";
     public String newsPanelColor    = "#080404";
@@ -88,7 +88,7 @@ public class ThemeManager {
     /** Returns a copy of the current theme, useful as a scratch/draft object for live previews. */
     public ThemeManager copy() {
         ThemeManager t = new ThemeManager();
-        t.backgroundColor    = this.backgroundColor;
+        t.titleBarColor      = this.titleBarColor;
         t.leftPanelColor     = this.leftPanelColor;
         t.centerPanelColor   = this.centerPanelColor;
         t.newsPanelColor     = this.newsPanelColor;
@@ -107,7 +107,7 @@ public class ThemeManager {
 
     /** Copies every field from `other` into this (live) instance, without saving/notifying. */
     public void copyFrom(ThemeManager other) {
-        this.backgroundColor    = other.backgroundColor;
+        this.titleBarColor      = other.titleBarColor;
         this.leftPanelColor     = other.leftPanelColor;
         this.centerPanelColor   = other.centerPanelColor;
         this.newsPanelColor     = other.newsPanelColor;
@@ -143,7 +143,7 @@ public class ThemeManager {
                 String json = new String(Files.readAllBytes(THEME_FILE));
                 JsonObject obj = GSON.fromJson(json, JsonObject.class);
                 if (obj == null) return;
-                backgroundColor    = str(obj, "backgroundColor", backgroundColor);
+                titleBarColor      = str(obj, "titleBarColor", titleBarColor);
                 leftPanelColor     = str(obj, "leftPanelColor", leftPanelColor);
                 centerPanelColor   = str(obj, "centerPanelColor", centerPanelColor);
                 newsPanelColor     = str(obj, "newsPanelColor", newsPanelColor);
@@ -167,7 +167,7 @@ public class ThemeManager {
         try {
             Files.createDirectories(DATA_DIR);
             JsonObject obj = new JsonObject();
-            obj.addProperty("backgroundColor", backgroundColor);
+            obj.addProperty("titleBarColor", titleBarColor);
             obj.addProperty("leftPanelColor", leftPanelColor);
             obj.addProperty("centerPanelColor", centerPanelColor);
             obj.addProperty("newsPanelColor", newsPanelColor);

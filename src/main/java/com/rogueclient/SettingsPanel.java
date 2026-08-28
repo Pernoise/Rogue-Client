@@ -36,7 +36,7 @@ public class SettingsPanel extends VBox {
     public SettingsPanel(SettingsManager settings) {
         this.settings = settings;
 
-        setStyle("-fx-background-color: " + ThemeManager.getInstance().backgroundColor + ";");
+        setStyle("-fx-background-color: #0f0f0f;");
         setPrefHeight(520);
         setPadding(new Insets(24));
         setSpacing(16);

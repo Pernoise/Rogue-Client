@@ -20,7 +20,7 @@ public class AuthPanel extends VBox {
         this.accountManager = accountManager;
         setPadding(new Insets(20));
         setSpacing(12);
-        setStyle("-fx-background-color: " + ThemeManager.getInstance().backgroundColor + ";");
+        setStyle("-fx-background-color: #0f0f0f;");
 
         Label title = new Label("Accounts");
         title.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 16; -fx-font-family: 'JetBrains Mono'; -fx-font-weight: bold;");

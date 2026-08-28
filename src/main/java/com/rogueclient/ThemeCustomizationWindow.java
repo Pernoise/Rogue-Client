@@ -9,6 +9,8 @@ import javafx.scene.text.Font;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -39,7 +41,7 @@ public class ThemeCustomizationWindow {
 
         VBox controls = buildControls(draft);
         ScrollPane controlsScroll = new ScrollPane(controls);
-        controlsScroll.getStyleClass().add("rocket-scroll");
+        controlsScroll.getStyleClass().add("rogue-scroll");
         controlsScroll.setFitToWidth(true);
         controlsScroll.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;");
         controlsScroll.setPrefWidth(300);
@@ -110,7 +112,7 @@ public class ThemeCustomizationWindow {
         box.setPadding(new Insets(0, 12, 0, 0));
 
         box.getChildren().add(sectionLabel("Colors"));
-        box.getChildren().add(colorRow(box, "Main Background", draft.backgroundColor, c -> draft.backgroundColor = c));
+        box.getChildren().add(colorRow(box, "Title Bar", draft.titleBarColor, c -> draft.titleBarColor = c));
         box.getChildren().add(colorRow(box, "Left Panel", draft.leftPanelColor, c -> draft.leftPanelColor = c));
         box.getChildren().add(colorRow(box, "Center Panel", draft.centerPanelColor, c -> draft.centerPanelColor = c));
         box.getChildren().add(colorRow(box, "News Panel", draft.newsPanelColor, c -> draft.newsPanelColor = c));
@@ -124,29 +126,17 @@ public class ThemeCustomizationWindow {
 
         box.getChildren().add(sectionLabel("Fonts"));
 
-        ComboBox<String> headlineFont = new ComboBox<>();
-        headlineFont.getItems().add("(Default)");
-        headlineFont.getItems().addAll(FontManager.getHeadlineFontFamilies());
-        headlineFont.setValue(draft.headlineFontFamily == null || draft.headlineFontFamily.isEmpty() ? "(Default)" : draft.headlineFontFamily);
-        headlineFont.setStyle(fieldStyle());
-        headlineFont.setMaxWidth(Double.MAX_VALUE);
-        headlineFont.valueProperty().addListener((o, old, val) -> {
-            draft.headlineFontFamily = "(Default)".equals(val) ? "" : val;
-            fireChange(box);
-        });
-        box.getChildren().addAll(smallLabel("Headline Font (drop files in fonts/headline)"), headlineFont);
+        List<String> headlineOptions = new ArrayList<>();
+        headlineOptions.add("(Default)");
+        headlineOptions.addAll(FontManager.getHeadlineFontFamilies());
+        box.getChildren().addAll(smallLabel("Headline Font (drop files in fonts/headline)"),
+            fontPicker(box, headlineOptions, draft.headlineFontFamily, val -> draft.headlineFontFamily = val));
 
-        ComboBox<String> textFont = new ComboBox<>();
-        textFont.getItems().add("(Default)");
-        textFont.getItems().addAll(FontManager.getTextFontFamilies());
-        textFont.setValue(draft.textFontFamily == null || draft.textFontFamily.isEmpty() ? "(Default)" : draft.textFontFamily);
-        textFont.setStyle(fieldStyle());
-        textFont.setMaxWidth(Double.MAX_VALUE);
-        textFont.valueProperty().addListener((o, old, val) -> {
-            draft.textFontFamily = "(Default)".equals(val) ? "" : val;
-            fireChange(box);
-        });
-        box.getChildren().addAll(smallLabel("Text Font (drop files in fonts/text)"), textFont);
+        List<String> textOptions = new ArrayList<>();
+        textOptions.add("(Default)");
+        textOptions.addAll(FontManager.getTextFontFamilies());
+        box.getChildren().addAll(smallLabel("Text Font (drop files in fonts/text)"),
+            fontPicker(box, textOptions, draft.textFontFamily, val -> draft.textFontFamily = val));
 
         Label sizeLabel = new Label("Headline Size: " + (int) draft.headlineFontSize);
         sizeLabel.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 10; -fx-font-family: 'JetBrains Mono';");
@@ -161,6 +151,56 @@ public class ThemeCustomizationWindow {
         box.getChildren().addAll(sizeLabel, sizeSlider);
 
         return box;
+    }
+
+    /**
+     * Font picker styled to match the launcher's own version-select dropdown (a button that
+     * reveals a scrollable list of rows) instead of a stock JavaFX ComboBox.
+     */
+    private static VBox fontPicker(VBox parentBox, List<String> options, String currentValue, Consumer<String> onChange) {
+        String initial = (currentValue == null || currentValue.isEmpty()) ? "(Default)" : currentValue;
+
+        VBox wrap = new VBox(4);
+        Button toggle = new Button(initial);
+        toggle.setMaxWidth(Double.MAX_VALUE);
+        toggle.setAlignment(Pos.CENTER_LEFT);
+        toggle.setStyle(fontPickerBtnStyle());
+
+        VBox listContent = new VBox(2);
+        listContent.setPadding(new Insets(4));
+
+        ScrollPane scroll = new ScrollPane(listContent);
+        scroll.getStyleClass().add("rogue-scroll");
+        scroll.setMaxHeight(160);
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background: #0d0d0d; -fx-background-color: #0d0d0d; -fx-border-color: #1a1a1a; -fx-border-radius: 7; -fx-background-radius: 7;");
+        scroll.setVisible(false);
+        scroll.setManaged(false);
+
+        for (String option : options) {
+            Label row = new Label(option);
+            row.setMaxWidth(Double.MAX_VALUE);
+            row.setStyle(dropdownRowStyle());
+            row.setOnMouseEntered(e -> row.setStyle(dropdownRowHoverStyle()));
+            row.setOnMouseExited(e -> row.setStyle(dropdownRowStyle()));
+            row.setOnMouseClicked(e -> {
+                toggle.setText(option);
+                onChange.accept("(Default)".equals(option) ? "" : option);
+                scroll.setVisible(false);
+                scroll.setManaged(false);
+                fireChange(parentBox);
+            });
+            listContent.getChildren().add(row);
+        }
+
+        toggle.setOnAction(e -> {
+            boolean opening = !scroll.isVisible();
+            scroll.setVisible(opening);
+            scroll.setManaged(opening);
+        });
+
+        wrap.getChildren().addAll(toggle, scroll);
+        return wrap;
     }
 
     private static HBox colorRow(VBox parent, String label, String initialHex, Consumer<String> onChange) {
@@ -212,10 +252,22 @@ public class ThemeCustomizationWindow {
         Label caption = new Label("LIVE PREVIEW");
         caption.setStyle("-fx-text-fill: #666666; -fx-font-size: 9; -fx-font-family: 'JetBrains Mono';");
 
-        HBox launcher = new HBox();
+        VBox launcher = new VBox();
         launcher.setPrefSize(420, 260);
         launcher.setMaxSize(420, 260);
-        launcher.setStyle("-fx-background-color: " + t.backgroundColor + "; -fx-background-radius: 10; -fx-border-color: #1a1a1a; -fx-border-radius: 10; -fx-border-width: 1;");
+        launcher.setStyle("-fx-background-color: #080404; -fx-background-radius: 10; -fx-border-color: #1a1a1a; -fx-border-radius: 10; -fx-border-width: 1;");
+
+        HBox titleBarMock = new HBox();
+        titleBarMock.setPrefHeight(20);
+        titleBarMock.setAlignment(Pos.CENTER_LEFT);
+        titleBarMock.setPadding(new Insets(0, 8, 0, 10));
+        titleBarMock.setStyle("-fx-background-color: " + t.titleBarColor + "; -fx-background-radius: 10 10 0 0;");
+        Label titleBarLabel = new Label("Rogue Client");
+        titleBarLabel.setStyle("-fx-text-fill: " + t.textColor + "; -fx-font-size: 8; -fx-font-family: 'JetBrains Mono';");
+        titleBarMock.getChildren().add(titleBarLabel);
+
+        HBox body = new HBox();
+        VBox.setVgrow(body, Priority.ALWAYS);
 
         // Left panel mock
         VBox left = new VBox(6);
@@ -268,7 +320,8 @@ public class ThemeCustomizationWindow {
         newsItem.setStyle("-fx-text-fill: " + t.secondaryTextColor + "; -fx-font-size: 8; -fx-font-family: 'JetBrains Mono';");
         news.getChildren().addAll(newsTitle, newsItem);
 
-        launcher.getChildren().addAll(left, center, news);
+        body.getChildren().addAll(left, center, news);
+        launcher.getChildren().addAll(titleBarMock, body);
         wrapper.getChildren().addAll(caption, launcher);
         return wrapper;
     }
@@ -315,6 +368,21 @@ public class ThemeCustomizationWindow {
                "-fx-font-family: 'JetBrains Mono'; -fx-font-size: 11; " +
                "-fx-border-color: #222222; -fx-border-radius: 6; -fx-background-radius: 6; " +
                "-fx-padding: 6 8;";
+    }
+
+    private static String fontPickerBtnStyle() {
+        return "-fx-background-color: #141414; -fx-text-fill: #ffffff; " +
+               "-fx-font-family: 'JetBrains Mono'; -fx-font-size: 11; " +
+               "-fx-border-color: #222222; -fx-border-radius: 6; -fx-background-radius: 6; " +
+               "-fx-cursor: hand; -fx-padding: 6 10;";
+    }
+
+    private static String dropdownRowStyle() {
+        return "-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono'; -fx-padding: 6 10;";
+    }
+
+    private static String dropdownRowHoverStyle() {
+        return dropdownRowStyle() + " -fx-background-color: #161616; -fx-background-radius: 5;";
     }
 
     private static String secondaryBtnStyle() {

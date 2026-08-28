@@ -49,7 +49,7 @@ public class RogueWindowChrome {
         titleBar.setMaxWidth(Double.MAX_VALUE);
         titleBar.setAlignment(Pos.CENTER_LEFT);
         titleBar.setPadding(new Insets(6, 8, 6, 12));
-        titleBar.setStyle("-fx-background-color: " + theme.backgroundColor + "; -fx-background-radius: 12 12 0 0;");
+        titleBar.setStyle("-fx-background-color: " + theme.titleBarColor + "; -fx-background-radius: 12 12 0 0;");
 
         double[] offset = new double[2];
         titleBar.setOnMousePressed(e -> { offset[0] = e.getSceneX(); offset[1] = e.getSceneY(); });
@@ -62,14 +62,14 @@ public class RogueWindowChrome {
 
         VBox wrapper = new VBox(0, titleBar, content);
         VBox.setVgrow(content, Priority.ALWAYS);
-        wrapper.setStyle("-fx-background-color: " + theme.backgroundColor + "; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #1a1a1a; -fx-border-width: 1;");
+        wrapper.setStyle("-fx-background-color: #080404; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #1a1a1a; -fx-border-width: 1;");
 
-        // Live-restyle this popup's chrome if the theme is saved while it's still open.
+        // Live-restyle this popup's title bar if the theme is saved while it's still open.
+        // Wrapper background is intentionally fixed - see the comment in Main.java.
         Runnable themeListener = () -> {
             ThemeManager t = ThemeManager.getInstance();
             titleLabel.setStyle("-fx-text-fill: " + t.textColor + "; -fx-font-size: 11; -fx-font-family: '" + t.textFontFamilyOrDefault() + "';");
-            titleBar.setStyle("-fx-background-color: " + t.backgroundColor + "; -fx-background-radius: 12 12 0 0;");
-            wrapper.setStyle("-fx-background-color: " + t.backgroundColor + "; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #1a1a1a; -fx-border-width: 1;");
+            titleBar.setStyle("-fx-background-color: " + t.titleBarColor + "; -fx-background-radius: 12 12 0 0;");
         };
         theme.addListener(themeListener);
 

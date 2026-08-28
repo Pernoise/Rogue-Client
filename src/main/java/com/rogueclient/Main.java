@@ -99,7 +99,7 @@ public class Main extends Application {
             titleBar.setMaxWidth(Double.MAX_VALUE);
             titleBar.setAlignment(Pos.CENTER_LEFT);
             titleBar.setPadding(new Insets(6, 8, 6, 12));
-            titleBar.setStyle("-fx-background-color: " + themeManager.backgroundColor + "; -fx-background-radius: 12 12 0 0;");
+            titleBar.setStyle("-fx-background-color: " + themeManager.titleBarColor + "; -fx-background-radius: 12 12 0 0;");
 
             titleBar.setOnMousePressed(e -> { xOffset = e.getSceneX(); yOffset = e.getSceneY(); });
             titleBar.setOnMouseDragged(e -> {
@@ -110,7 +110,7 @@ public class Main extends Application {
             });
 
             BorderPane root = new BorderPane();
-            root.setStyle("-fx-background-color: " + themeManager.backgroundColor + "; -fx-font-family: 'JetBrains Mono'; -fx-background-radius: 0 0 12 12;");
+            root.setStyle("-fx-background-color: #080404; -fx-font-family: 'JetBrains Mono'; -fx-background-radius: 0 0 12 12;");
             LeftPanel leftPanel = new LeftPanel(accountManager, settingsManager);
             CenterPanel centerPanel = new CenterPanel(accountManager, settingsManager);
             NewsPanel newsPanel = new NewsPanel();
@@ -120,13 +120,14 @@ public class Main extends Application {
 
             VBox wrapper = new VBox(0, titleBar, root);
             VBox.setVgrow(root, Priority.ALWAYS);
-            wrapper.setStyle("-fx-background-color: " + themeManager.backgroundColor + "; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #1a1a1a; -fx-border-width: 1;");
+            wrapper.setStyle("-fx-background-color: #080404; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #1a1a1a; -fx-border-width: 1;");
 
             // Re-skin the launcher live whenever the Style settings are saved, without needing a restart.
+            // Only the title bar is theme-driven here - the root/wrapper background stays fixed
+            // since the visible surface is fully covered by the left/center/news panels anyway,
+            // and letting it follow the theme too caused rendering glitches around their edges.
             themeManager.addListener(() -> {
-                titleBar.setStyle("-fx-background-color: " + themeManager.backgroundColor + "; -fx-background-radius: 12 12 0 0;");
-                root.setStyle("-fx-background-color: " + themeManager.backgroundColor + "; -fx-font-family: 'JetBrains Mono'; -fx-background-radius: 0 0 12 12;");
-                wrapper.setStyle("-fx-background-color: " + themeManager.backgroundColor + "; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #1a1a1a; -fx-border-width: 1;");
+                titleBar.setStyle("-fx-background-color: " + themeManager.titleBarColor + "; -fx-background-radius: 12 12 0 0;");
                 leftPanel.refreshTheme();
                 centerPanel.refreshTheme();
                 newsPanel.refreshTheme();

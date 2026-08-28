@@ -19,7 +19,7 @@ echo "Jar built!"
 echo "Packaging into an appimage..."
 sleep 1
 
-JPACKAGE_CMD="/home/farlaxfard/.jdks/temurin-21.0.12/bin/jpackage"
+JPACKAGE_CMD="/usr/lib/jvm/java-21-openjdk-amd64/bin/jpackage"
 
 $JPACKAGE_CMD @"$SCRIPT_DIR/jpackagerOptions.txt" || { echo "jpackage failed!"; exit 1; }
 
