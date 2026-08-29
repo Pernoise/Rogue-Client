@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="src/main/resources/images/icon.png" width="128" alt="Rogue Client Logo">
+<img src="src/main/resources/images/rogue-launch.png" width="128" alt="Rogue Client Logo">
 
 # Rogue Client
 
