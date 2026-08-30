@@ -76,7 +76,7 @@ public class NewInstanceDialog {
 
         VBox content = new VBox(16, iconRow, labeled(nameLabel, nameField), labeled(loaderLabel, loaderValue), btnRow);
         content.setPadding(new Insets(20));
-        content.setStyle("-fx-background-color: " + ThemedStyles.mainBg() + ";");
+        content.setStyle("-fx-background-color: " + ThemedStyles.fixedBaseBg() + ";");
 
         RogueWindowChrome.apply(stage, "NEW INSTANCE", content, 360, 320, null);
         stage.centerOnScreen();

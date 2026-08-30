@@ -28,7 +28,7 @@ public class StylePanel extends VBox {
 
         getChildren().add(categoryRow(
             "Background & Panels",
-            "Main background, Left Panel, Center Panel, News Panel, borders",
+            "Title Bar, Left Panel, Center Panel, News Panel, borders",
             () -> new String[]{ThemeManager.get().mainBackground, ThemeManager.get().leftPanelBackground,
                                 ThemeManager.get().centerPanelBackground, ThemeManager.get().newsPanelBackground},
             this::openBackgroundEditor
@@ -40,6 +40,13 @@ public class StylePanel extends VBox {
             () -> new String[]{ThemeManager.get().buttonBackground, ThemeManager.get().buttonHoverBackground,
                                 ThemeManager.get().buttonPressedBackground},
             this::openButtonsEditor
+        ));
+
+        getChildren().add(categoryRow(
+            "Splash Screen",
+            "Background of the loading screen shown on launch",
+            () -> new String[]{ThemeManager.get().splashBackground},
+            this::openSplashEditor
         ));
 
         getChildren().add(categoryRow(
@@ -121,7 +128,7 @@ public class StylePanel extends VBox {
         ThemeEditorWindow.open("Background & Panels", (draft, onChange) -> {
             VBox col = new VBox(14);
             col.getChildren().addAll(
-                ThemeEditorWindow.colorRow("Main Background", draft, d -> d.mainBackground, (d, v) -> d.mainBackground = v, onChange),
+                ThemeEditorWindow.colorRow("Title Bar", draft, d -> d.mainBackground, (d, v) -> d.mainBackground = v, onChange),
                 ThemeEditorWindow.colorRow("Left Panel", draft, d -> d.leftPanelBackground, (d, v) -> d.leftPanelBackground = v, onChange),
                 ThemeEditorWindow.colorRow("Center Panel", draft, d -> d.centerPanelBackground, (d, v) -> d.centerPanelBackground = v, onChange),
                 ThemeEditorWindow.colorRow("News Panel", draft, d -> d.newsPanelBackground, (d, v) -> d.newsPanelBackground = v, onChange),
@@ -144,6 +151,16 @@ public class StylePanel extends VBox {
             );
             return col;
         });
+    }
+
+    private void openSplashEditor() {
+        ThemeEditorWindow.open("Splash Screen", (draft, onChange) -> {
+            VBox col = new VBox(14);
+            col.getChildren().add(
+                ThemeEditorWindow.colorRow("Background", draft, d -> d.splashBackground, (d, v) -> d.splashBackground = v, onChange)
+            );
+            return col;
+        }, ThemeEditorWindow::buildSplashPreview);
     }
 
     private void openTextColorsEditor() {

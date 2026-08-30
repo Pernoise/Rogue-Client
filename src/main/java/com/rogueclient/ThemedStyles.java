@@ -24,6 +24,17 @@ public class ThemedStyles {
     public static String newsBg()   { return ThemeManager.get().newsPanelBackground; }
     public static String border()   { return ThemeManager.get().panelBorderColor; }
 
+    /**
+     * The launcher's fixed base background - always the original default dark color,
+     * never affected by the "Main Background" theme customization. That customization
+     * only recolors the title bar strip (see mainBg()); everything else that isn't a
+     * Left/Center/News panel (window wrapper edges, popup bodies, etc.) uses this instead,
+     * so changing the title bar color doesn't unexpectedly recolor the rest of the launcher.
+     */
+    public static String fixedBaseBg() { return ThemeManager.DEFAULT_MAIN_BACKGROUND; }
+
+    public static String splashBg() { return ThemeManager.get().splashBackground; }
+
     // ---- Buttons ----
     public static String btnBg()            { return ThemeManager.get().buttonBackground; }
     public static String btnHoverBg()       { return ThemeManager.get().buttonHoverBackground; }

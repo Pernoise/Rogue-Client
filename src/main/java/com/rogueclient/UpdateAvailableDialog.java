@@ -15,7 +15,7 @@ public class UpdateAvailableDialog {
         VBox root = new VBox(14);
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(28, 32, 24, 32));
-        root.setStyle("-fx-background-color: " + ThemedStyles.mainBg() + ";");
+        root.setStyle("-fx-background-color: " + ThemedStyles.fixedBaseBg() + ";");
 
         Label title = new Label("Update available");
         title.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 15; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-weight: bold;");

@@ -43,6 +43,8 @@ public class ThemeManager {
     public static final String DEFAULT_BUTTON_DISABLED_BACKGROUND = "#1a1a1a";
     public static final String DEFAULT_BUTTON_DISABLED_TEXT_COLOR = "#666666";
 
+    public static final String DEFAULT_SPLASH_BACKGROUND = "#080404";
+
     public static final String DEFAULT_TEXT_COLOR           = "#ffffff";
     public static final String DEFAULT_SECONDARY_TEXT_COLOR = "#888888";
     public static final String DEFAULT_HEADLINE_TEXT_COLOR  = "#ffffff";
@@ -68,6 +70,8 @@ public class ThemeManager {
     public String buttonTextColor          = DEFAULT_BUTTON_TEXT_COLOR;
     public String buttonDisabledBackground = DEFAULT_BUTTON_DISABLED_BACKGROUND;
     public String buttonDisabledTextColor  = DEFAULT_BUTTON_DISABLED_TEXT_COLOR;
+
+    public String splashBackground = DEFAULT_SPLASH_BACKGROUND;
 
     public String textColor          = DEFAULT_TEXT_COLOR;
     public String secondaryTextColor = DEFAULT_SECONDARY_TEXT_COLOR;
@@ -132,6 +136,7 @@ public class ThemeManager {
         this.buttonTextColor          = src.buttonTextColor;
         this.buttonDisabledBackground = src.buttonDisabledBackground;
         this.buttonDisabledTextColor  = src.buttonDisabledTextColor;
+        this.splashBackground = src.splashBackground;
         this.textColor          = src.textColor;
         this.secondaryTextColor = src.secondaryTextColor;
         this.headlineTextColor  = src.headlineTextColor;
@@ -169,6 +174,7 @@ public class ThemeManager {
         buttonTextColor          = DEFAULT_BUTTON_TEXT_COLOR;
         buttonDisabledBackground = DEFAULT_BUTTON_DISABLED_BACKGROUND;
         buttonDisabledTextColor  = DEFAULT_BUTTON_DISABLED_TEXT_COLOR;
+        splashBackground = DEFAULT_SPLASH_BACKGROUND;
         textColor          = DEFAULT_TEXT_COLOR;
         secondaryTextColor = DEFAULT_SECONDARY_TEXT_COLOR;
         headlineTextColor  = DEFAULT_HEADLINE_TEXT_COLOR;
@@ -195,6 +201,7 @@ public class ThemeManager {
             && eq(d.buttonTextColor, DEFAULT_BUTTON_TEXT_COLOR)
             && eq(d.buttonDisabledBackground, DEFAULT_BUTTON_DISABLED_BACKGROUND)
             && eq(d.buttonDisabledTextColor, DEFAULT_BUTTON_DISABLED_TEXT_COLOR)
+            && eq(d.splashBackground, DEFAULT_SPLASH_BACKGROUND)
             && eq(d.textColor, DEFAULT_TEXT_COLOR)
             && eq(d.secondaryTextColor, DEFAULT_SECONDARY_TEXT_COLOR)
             && eq(d.headlineTextColor, DEFAULT_HEADLINE_TEXT_COLOR)
@@ -225,6 +232,7 @@ public class ThemeManager {
                 buttonTextColor          = str(obj, "buttonTextColor", buttonTextColor);
                 buttonDisabledBackground = str(obj, "buttonDisabledBackground", buttonDisabledBackground);
                 buttonDisabledTextColor  = str(obj, "buttonDisabledTextColor", buttonDisabledTextColor);
+                splashBackground = str(obj, "splashBackground", splashBackground);
                 textColor          = str(obj, "textColor", textColor);
                 secondaryTextColor = str(obj, "secondaryTextColor", secondaryTextColor);
                 headlineTextColor  = str(obj, "headlineTextColor", headlineTextColor);
@@ -257,6 +265,7 @@ public class ThemeManager {
             obj.addProperty("buttonTextColor", buttonTextColor);
             obj.addProperty("buttonDisabledBackground", buttonDisabledBackground);
             obj.addProperty("buttonDisabledTextColor", buttonDisabledTextColor);
+            obj.addProperty("splashBackground", splashBackground);
             obj.addProperty("textColor", textColor);
             obj.addProperty("secondaryTextColor", secondaryTextColor);
             obj.addProperty("headlineTextColor", headlineTextColor);

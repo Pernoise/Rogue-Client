@@ -32,7 +32,7 @@ public class LogViewerWindow {
         logScroll.getStyleClass().add("rocket-scroll");
         logScroll.setFitToWidth(true);
         logScroll.setStyle(
-            "-fx-background: " + ThemedStyles.mainBg() + "; -fx-background-color: " + ThemedStyles.mainBg() + "; " +
+            "-fx-background: " + ThemedStyles.centerBg() + "; -fx-background-color: " + ThemedStyles.centerBg() + "; " +
             "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 6; -fx-background-radius: 6;"
         );
         VBox.setVgrow(logScroll, Priority.ALWAYS);
@@ -104,7 +104,7 @@ public class LogViewerWindow {
 
         VBox root = new VBox(12, tabRow, logScroll, btnRow);
         root.setPadding(new Insets(20));
-        root.setStyle("-fx-background-color: " + ThemedStyles.mainBg() + ";");
+        root.setStyle("-fx-background-color: " + ThemedStyles.centerBg() + ";");
 
         RogueWindowChrome.apply(stage, "LOGS", root, 860, 620, null);
 

@@ -71,7 +71,7 @@ public class IconPickerWindow {
 
         VBox root = new VBox(14, grid, browseBtn);
         root.setPadding(new Insets(20));
-        root.setStyle("-fx-background-color: " + ThemedStyles.mainBg() + ";");
+        root.setStyle("-fx-background-color: " + ThemedStyles.fixedBaseBg() + ";");
 
         RogueWindowChrome.apply(stage, "CHOOSE ICON", root, 340, 380, null);
         stage.centerOnScreen();

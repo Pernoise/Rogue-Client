@@ -6,7 +6,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
@@ -30,7 +29,7 @@ public class SplashScreen {
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(60, 80, 32, 80));
         root.setStyle(
-            "-fx-background-color: " + ThemedStyles.mainBg() + ";" +
+            "-fx-background-color: " + ThemedStyles.splashBg() + ";" +
             "-fx-background-radius: 12;" +
             "-fx-border-color: " + ThemedStyles.border() + ";" +
             "-fx-border-width: 1;" +
@@ -54,18 +53,13 @@ public class SplashScreen {
         Label version = new Label("v1.0");
         version.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 10; -fx-font-family: '" + ThemedStyles.font() + "';");
 
-        ProgressBar progressBar = new ProgressBar(0);
-        progressBar.setPrefWidth(260);
-        progressBar.setPrefHeight(2);
-        progressBar.setStyle("-fx-accent: #ffffff; -fx-background-color: #111111; -fx-background-radius: 2; -fx-border-radius: 2;");
-
         Label status = new Label("Initializing...");
         status.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 10; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         Label website = new Label("rogue.pernoise.workers.dev");
         website.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 9; -fx-font-family: '" + ThemedStyles.font() + "';");
 
-        root.getChildren().addAll(logo, title, version, progressBar, status, website);
+        root.getChildren().addAll(logo, title, version, status, website);
 
         Scene scene = new Scene(root, 480, 220);
         scene.setFill(Color.TRANSPARENT);
@@ -89,12 +83,10 @@ public class SplashScreen {
 
         Timeline timeline = new Timeline();
         for (int i = 0; i < steps.length; i++) {
-            final double progress = Double.parseDouble(steps[i][0]);
-            final String text     = steps[i][1];
-            final boolean last    = (i == steps.length - 1);
+            final String text  = steps[i][1];
+            final boolean last = (i == steps.length - 1);
 
             timeline.getKeyFrames().add(new KeyFrame(Duration.millis(600 * (i + 1)), e -> {
-                progressBar.setProgress(progress);
                 status.setText(text);
                 if (last) {
                     new Timeline(new KeyFrame(Duration.millis(400), ev -> {
