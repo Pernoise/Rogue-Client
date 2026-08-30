@@ -26,15 +26,13 @@ public class SplashScreen {
         stage.initStyle(StageStyle.TRANSPARENT);
         stage.setResizable(false);
 
-        ThemeManager theme = ThemeManager.getInstance();
-
         VBox root = new VBox(20);
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(60, 80, 32, 80));
         root.setStyle(
-            "-fx-background-color: " + theme.centerPanelColor + ";" +
+            "-fx-background-color: " + ThemedStyles.mainBg() + ";" +
             "-fx-background-radius: 12;" +
-            "-fx-border-color: #1a1a1a;" +
+            "-fx-border-color: " + ThemedStyles.border() + ";" +
             "-fx-border-width: 1;" +
             "-fx-border-radius: 12;"
         );
@@ -51,26 +49,21 @@ public class SplashScreen {
         }
 
         Label title = new Label("Rogue Client");
-        if (theme.headlineFontFamily != null && !theme.headlineFontFamily.isEmpty()) {
-            title.setFont(javafx.scene.text.Font.font(theme.headlineFontFamily, 22));
-            title.setStyle("-fx-text-fill: " + theme.headlineColor + "; -fx-opacity: 0.88;");
-        } else {
-            title.setStyle("-fx-text-fill: " + theme.headlineColor + "; -fx-font-size: 22; -fx-font-family: 'JetBrains Mono'; -fx-font-weight: bold; -fx-opacity: 0.88;");
-        }
+        title.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 22; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-weight: bold; -fx-opacity: 0.88;");
 
         Label version = new Label("v1.0");
-        version.setStyle("-fx-text-fill: " + theme.textColor + "; -fx-font-size: 10; -fx-font-family: '" + theme.textFontFamilyOrDefault() + "';");
+        version.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 10; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         ProgressBar progressBar = new ProgressBar(0);
         progressBar.setPrefWidth(260);
         progressBar.setPrefHeight(2);
-        progressBar.setStyle("-fx-accent: " + theme.buttonColor + "; -fx-background-color: #111111; -fx-background-radius: 2; -fx-border-radius: 2;");
+        progressBar.setStyle("-fx-accent: #ffffff; -fx-background-color: #111111; -fx-background-radius: 2; -fx-border-radius: 2;");
 
         Label status = new Label("Initializing...");
-        status.setStyle("-fx-text-fill: " + theme.textColor + "; -fx-font-size: 10; -fx-font-family: '" + theme.textFontFamilyOrDefault() + "';");
+        status.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 10; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         Label website = new Label("rogue.pernoise.workers.dev");
-        website.setStyle("-fx-text-fill: " + theme.secondaryTextColor + "; -fx-font-size: 9; -fx-font-family: '" + theme.textFontFamilyOrDefault() + "';");
+        website.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 9; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         root.getChildren().addAll(logo, title, version, progressBar, status, website);
 

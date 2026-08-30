@@ -32,20 +32,23 @@ import java.util.zip.ZipOutputStream;
 public class SettingsPanel extends VBox {
 
     private final SettingsManager settings;
+    private Label titleLabel;
+    private HBox tabBar;
 
     public SettingsPanel(SettingsManager settings) {
         this.settings = settings;
 
-        setStyle("-fx-background-color: #0f0f0f;");
-        setPrefHeight(520);
+        applyPanelStyle();
+        setPrefWidth(560);
+        setPrefHeight(620);
         setPadding(new Insets(24));
         setSpacing(16);
 
-        Label title = new Label("Settings");
-        title.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 14; -fx-font-family: 'JetBrains Mono'; -fx-font-weight: bold; -fx-opacity: 0.88;");
+        titleLabel = new Label("Settings");
+        applyTitleStyle();
 
-        HBox tabBar = new HBox(2);
-        tabBar.setStyle("-fx-border-color: #1a1a1a; -fx-border-width: 0 0 1 0;");
+        tabBar = new HBox(2);
+        applyTabBarStyle();
 
         Button launchTab  = tabButton("Launch",  true);
         Button discordTab = tabButton("Discord", false);
@@ -56,104 +59,101 @@ public class SettingsPanel extends VBox {
 
         VBox launchPanel  = buildLaunchPanel();
         VBox discordPanel = buildDiscordPanel();
-        VBox stylePanel   = buildStylePanel();
+        VBox stylePanel   = new StylePanel();
         VBox aboutPanel   = buildAboutPanel();
         VBox devtoolsPanel = buildDevtoolsPanel();
 
         discordPanel.setVisible(false); discordPanel.setManaged(false);
-        stylePanel.setVisible(false);   stylePanel.setManaged(false);
         aboutPanel.setVisible(false);   aboutPanel.setManaged(false);
         devtoolsPanel.setVisible(false);
         devtoolsPanel.setManaged(false);
 
-        StackPane content = new StackPane(launchPanel, discordPanel, stylePanel, aboutPanel, devtoolsPanel);
+        ScrollPane stylePanelScroll = new ScrollPane(stylePanel);
+        stylePanelScroll.getStyleClass().add("rocket-scroll");
+        stylePanelScroll.setFitToWidth(true);
+        stylePanelScroll.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;");
+        stylePanelScroll.setVisible(false);
+        stylePanelScroll.setManaged(false);
+
+        StackPane content = new StackPane(launchPanel, discordPanel, stylePanelScroll, aboutPanel, devtoolsPanel);
         VBox.setVgrow(content, Priority.ALWAYS);
 
-        Button[] allTabs = { launchTab, discordTab, styleTab, aboutTab, devToolsTab };
-        VBox[] allPanels = { launchPanel, discordPanel, stylePanel, aboutPanel, devtoolsPanel };
-
-        launchTab.setOnAction(e -> showOnly(launchPanel, allPanels, launchTab, allTabs));
-        discordTab.setOnAction(e -> showOnly(discordPanel, allPanels, discordTab, allTabs));
-        styleTab.setOnAction(e -> showOnly(stylePanel, allPanels, styleTab, allTabs));
-        aboutTab.setOnAction(e -> showOnly(aboutPanel, allPanels, aboutTab, allTabs));
-        devToolsTab.setOnAction(e -> showOnly(devtoolsPanel, allPanels, devToolsTab, allTabs));
-
-        getChildren().addAll(title, tabBar, content);
-    }
-
-    private void showOnly(VBox toShow, VBox[] allPanels, Button activeTab, Button[] allTabs) {
-        for (VBox p : allPanels) {
-            boolean match = (p == toShow);
-            p.setVisible(match);
-            p.setManaged(match);
-        }
-        setActive(activeTab, java.util.Arrays.stream(allTabs).filter(b -> b != activeTab).toArray(Button[]::new));
-    }
-
-    private VBox buildStylePanel() {
-        VBox panel = new VBox(16);
-        panel.setPadding(new Insets(16, 0, 0, 0));
-
-        panel.getChildren().add(sectionLabel("Launcher Appearance"));
-
-        Label desc = new Label("Customize the launcher's colors, fonts, and headline size. " +
-            "Changes are previewed live and only take effect once saved.");
-        desc.setWrapText(true);
-        desc.setStyle("-fx-text-fill: #888888; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
-        panel.getChildren().add(desc);
-
-        Button openBtn = new Button("Open Customization Window");
-        openBtn.setStyle(secondaryBtnStyle());
-        openBtn.setOnAction(e -> ThemeCustomizationWindow.open());
-        panel.getChildren().add(openBtn);
-
-        panel.getChildren().add(sectionLabel("Custom Fonts"));
-        Label fontDesc = new Label("Drop .ttf/.otf/.woff files into:\n" +
-            FontManager.getHeadlineDir() + "\n" + FontManager.getTextDir() +
-            "\nThey'll show up as selectable fonts inside the customization window.");
-        fontDesc.setWrapText(true);
-        fontDesc.setStyle("-fx-text-fill: #888888; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
-        panel.getChildren().add(fontDesc);
-
-        Button openFolderBtn = new Button("Open Fonts Folder");
-        openFolderBtn.setStyle(secondaryBtnStyle());
-        openFolderBtn.setOnAction(e -> {
-            FontManager.ensureFoldersAndLoad();
-            openInFileManager(FontManager.getHeadlineDir().getParent());
+        launchTab.setOnAction(e -> {
+            launchPanel.setVisible(true);   launchPanel.setManaged(true);
+            discordPanel.setVisible(false); discordPanel.setManaged(false);
+            stylePanelScroll.setVisible(false); stylePanelScroll.setManaged(false);
+            aboutPanel.setVisible(false);   aboutPanel.setManaged(false);
+            devtoolsPanel.setVisible(false);
+            devtoolsPanel.setManaged(false);
+            setActive(launchTab, discordTab, styleTab, aboutTab, devToolsTab);
         });
-        panel.getChildren().add(openFolderBtn);
 
-        panel.getChildren().add(sectionLabel("Reset"));
-        Button resetBtn = new Button("Reset Appearance to Default");
-        resetBtn.setStyle(secondaryBtnStyle());
-        resetBtn.setOnAction(e -> {
-            ThemeManager tm = ThemeManager.getInstance();
-            tm.resetToDefaults();
-            tm.applyAndSave();
+        discordTab.setOnAction(e -> {
+            discordPanel.setVisible(true);  discordPanel.setManaged(true);
+            launchPanel.setVisible(false);  launchPanel.setManaged(false);
+            stylePanelScroll.setVisible(false); stylePanelScroll.setManaged(false);
+            aboutPanel.setVisible(false);   aboutPanel.setManaged(false);
+            devtoolsPanel.setVisible(false);
+            devtoolsPanel.setManaged(false);
+            setActive(discordTab, launchTab, styleTab, aboutTab, devToolsTab);
         });
-        panel.getChildren().add(resetBtn);
 
-        return panel;
+        styleTab.setOnAction(e -> {
+            stylePanelScroll.setVisible(true); stylePanelScroll.setManaged(true);
+            launchPanel.setVisible(false);  launchPanel.setManaged(false);
+            discordPanel.setVisible(false); discordPanel.setManaged(false);
+            aboutPanel.setVisible(false);   aboutPanel.setManaged(false);
+            devtoolsPanel.setVisible(false);
+            devtoolsPanel.setManaged(false);
+            setActive(styleTab, launchTab, discordTab, aboutTab, devToolsTab);
+        });
+
+        aboutTab.setOnAction(e -> {
+            aboutPanel.setVisible(true);    aboutPanel.setManaged(true);
+            launchPanel.setVisible(false);  launchPanel.setManaged(false);
+            discordPanel.setVisible(false); discordPanel.setManaged(false);
+            stylePanelScroll.setVisible(false); stylePanelScroll.setManaged(false);
+            devtoolsPanel.setVisible(false);
+            devtoolsPanel.setManaged(false);
+            setActive(aboutTab, launchTab, discordTab, styleTab, devToolsTab);
+        });
+        devToolsTab.setOnAction(e -> {
+            aboutPanel.setVisible(false);
+            aboutPanel.setManaged(false);
+            launchPanel.setVisible(false);
+            launchPanel.setManaged(false);
+            discordPanel.setVisible(false);
+            discordPanel.setManaged(false);
+            stylePanelScroll.setVisible(false);
+            stylePanelScroll.setManaged(false);
+            devtoolsPanel.setVisible(true);
+            devtoolsPanel.setManaged(true);
+            setActive(devToolsTab, launchTab, discordTab, styleTab, aboutTab);
+        });
+
+
+        getChildren().addAll(titleLabel, tabBar, content);
+
+        ThemeManager.addListener(() -> javafx.application.Platform.runLater(() -> {
+            applyPanelStyle();
+            applyTitleStyle();
+            applyTabBarStyle();
+        }));
     }
 
-    private void openInFileManager(Path path) {
-        try {
-            if (Files.exists(path) == false) {
-                Files.createDirectories(path);
-            }
-            String os = System.getProperty("os.name").toLowerCase();
-            ProcessBuilder pb;
-            if (os.contains("win")) {
-                pb = new ProcessBuilder("explorer", path.toString());
-            } else if (os.contains("mac")) {
-                pb = new ProcessBuilder("open", path.toString());
-            } else {
-                pb = new ProcessBuilder("xdg-open", path.toString());
-            }
-            pb.start();
-        } catch (Exception e) {
-            System.out.println("Could not open folder: " + e.getMessage());
-        }
+    private void applyPanelStyle() {
+        setStyle("-fx-background-color: " + ThemedStyles.panelBg() + ";");
+    }
+
+    private void applyTitleStyle() {
+        titleLabel.setStyle(
+            "-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 14; -fx-font-family: '" + ThemedStyles.font() + "'; " +
+            "-fx-font-weight: bold; -fx-opacity: 0.88;"
+        );
+    }
+
+    private void applyTabBarStyle() {
+        tabBar.setStyle("-fx-border-color: " + ThemedStyles.border() + "; -fx-border-width: 0 0 1 0;");
     }
 
     private VBox buildLaunchPanel() {
@@ -206,13 +206,13 @@ public class SettingsPanel extends VBox {
 
         int systemMax = SettingsManager.getSystemMaxRamMb();
         Label ramLabel = new Label(settings.ramMb + " MB");
-        ramLabel.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        ramLabel.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         panel.getChildren().add(sectionLabel("RAM Allocation (System max: " + systemMax + " MB)"));
         Slider ramSlider = new Slider(512, systemMax, settings.ramMb);
         ramSlider.setBlockIncrement(512);
         ramSlider.setMajorTickUnit(1024);
-        ramSlider.getStyleClass().add("rogue-slider");
+        ramSlider.getStyleClass().add("rocket-slider");
         ramSlider.setMaxWidth(Double.MAX_VALUE);
         ramSlider.valueProperty().addListener((obs, o, n) -> {
             int val = (n.intValue() / 512) * 512;
@@ -287,7 +287,7 @@ public class SettingsPanel extends VBox {
         }));
 
         Label info = new Label("Shows what you're doing in Minecraft as your Discord status.");
-        info.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        info.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         info.setWrapText(true);
         panel.getChildren().add(info);
 
@@ -330,10 +330,10 @@ public class SettingsPanel extends VBox {
         panel.setAlignment(Pos.TOP_LEFT);
 
         Label version = new Label("Rogue Client — v1.0");
-        version.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 13; -fx-font-family: 'JetBrains Mono'; -fx-font-weight: bold; -fx-opacity: 0.88;");
+        version.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 13; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-weight: bold; -fx-opacity: 0.88;");
 
         Label desc = new Label("A modern, lightweight Minecraft launcher built with love and.. Java");
-        desc.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        desc.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         desc.setWrapText(true);
 
         panel.getChildren().add(sectionLabel("Info"));
@@ -345,7 +345,7 @@ public class SettingsPanel extends VBox {
         Button checkUpdateBtn = new Button("Check for Updates");
         checkUpdateBtn.setStyle(secondaryBtnStyle());
         Label updateStatus = new Label();
-        updateStatus.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        updateStatus.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         checkUpdateBtn.setOnAction(e -> {
             checkUpdateBtn.setDisable(true);
             checkUpdateBtn.setText("Checking...");
@@ -378,15 +378,15 @@ public class SettingsPanel extends VBox {
 
         panel.getChildren().add(sectionLabel("Credits"));
         Label credits = new Label("Built by Pernoise");
-        credits.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        credits.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         panel.getChildren().add(credits);
 
         HBox avatarCreditRow = new HBox(4);
         avatarCreditRow.setAlignment(Pos.CENTER_LEFT);
         Label creditPrefix = new Label("Thank you to");
-        creditPrefix.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        creditPrefix.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         Label creditSuffix = new Label("for providing avatars.");
-        creditSuffix.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        creditSuffix.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         avatarCreditRow.getChildren().addAll(creditPrefix, linkLabel("Crafatar", "https://crafatar.com"), creditSuffix);
         panel.getChildren().add(avatarCreditRow);
 
@@ -405,7 +405,7 @@ public class SettingsPanel extends VBox {
 
         Label backupDesc = new Label("Compress every installed instance into a single zip archive.");
         backupDesc.setWrapText(true);
-        backupDesc.setStyle("-fx-text-fill: #7a7a7a; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        backupDesc.setStyle("-fx-text-fill: #7a7a7a; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         panel.getChildren().add(backupDesc);
 
         HBox backupRow = new HBox(12);
@@ -431,7 +431,7 @@ public class SettingsPanel extends VBox {
 
         Label nukeDesc = new Label("Permanently deletes your entire RogueClient data folder, including instances, accounts and settings.");
         nukeDesc.setWrapText(true);
-        nukeDesc.setStyle("-fx-text-fill: #7a7a7a; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        nukeDesc.setStyle("-fx-text-fill: #7a7a7a; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         panel.getChildren().add(nukeDesc);
 
         HBox nukeRow = new HBox(12);
@@ -470,22 +470,35 @@ public class SettingsPanel extends VBox {
             Path path = Paths.get(System.getProperty("user.home"), ".rogueclient");
 
             if (Files.exists(path)) {
-                try {
-                    // Walk the file tree in reverse (deleting files/subfolders before the parent folder)
+                // Release the log file handle first - on Windows a file that's still open for
+                // writing can't be deleted, which used to abort this whole operation as soon as
+                // the walk reached launcher-latest.log.
+                AppLog.close();
+
+                int[] failCount = {0};
+                if (Files.exists(path)) {
+                    // Walk the file tree in reverse (deleting files/subfolders before the parent folder).
+                    // Failures are skipped rather than aborting the whole walk, since one still-locked
+                    // file shouldn't prevent everything else from being cleared.
                     try (Stream<Path> walk = Files.walk(path)) {
                         walk.sorted(Comparator.reverseOrder())
                                 .forEach(p -> {
                                     try {
                                         Files.delete(p);
                                     } catch (IOException ex) {
-                                        throw new UncheckedIOException(ex);
+                                        failCount[0]++;
+                                        System.out.println("Could not delete " + p + ": " + ex.getMessage());
                                     }
                                 });
+                    } catch (IOException ex) {
+                        System.out.println("File walk failed: " + ex.getMessage());
                     }
+                }
+
+                if (failCount[0] == 0) {
                     showStatus(nukeStatus, "Success", true);
-                } catch (IOException | UncheckedIOException ex) {
-                    System.out.println("File deletion failed! " + ex.getMessage());
-                    showStatus(nukeStatus, "Failed", false);
+                } else {
+                    showStatus(nukeStatus, "Partially cleared (" + failCount[0] + " locked)", false);
                 }
             } else {
                 showStatus(nukeStatus, "Nothing to clear", false);
@@ -504,7 +517,7 @@ public class SettingsPanel extends VBox {
     private Label statusLabel() {
         Label label = new Label();
         label.setOpacity(0);
-        label.setStyle("-fx-font-size: 11; -fx-font-family: 'JetBrains Mono'; -fx-font-weight: bold;");
+        label.setStyle("-fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-weight: bold;");
         return label;
     }
 
@@ -512,7 +525,7 @@ public class SettingsPanel extends VBox {
     private void showStatus(Label label, String text, boolean success) {
         label.setText(text);
         label.setStyle("-fx-text-fill: " + (success ? "#3ddc84" : "#e0605a") +
-                "; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono'; -fx-font-weight: bold;");
+                "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-weight: bold;");
         label.setOpacity(1);
 
         FadeTransition fade = new FadeTransition(Duration.seconds(0.5), label);
@@ -557,10 +570,10 @@ public class SettingsPanel extends VBox {
         root.setPrefWidth(360);
 
         Label title = new Label("Backing up instances");
-        title.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 13; -fx-font-family: 'JetBrains Mono'; -fx-font-weight: bold;");
+        title.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 13; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-weight: bold;");
 
         Label fileLabel = new Label("Preparing...");
-        fileLabel.setStyle("-fx-text-fill: #7a7a7a; -fx-font-size: 10; -fx-font-family: 'JetBrains Mono';");
+        fileLabel.setStyle("-fx-text-fill: #7a7a7a; -fx-font-size: 10; -fx-font-family: '" + ThemedStyles.font() + "';");
         fileLabel.setWrapText(true);
 
         ProgressBar progressBar = new ProgressBar(0);
@@ -568,11 +581,11 @@ public class SettingsPanel extends VBox {
         progressBar.setStyle("-fx-accent: #ffffff;");
 
         Label percentLabel = new Label("0%");
-        percentLabel.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        percentLabel.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         Label warningLabel = new Label("Do not close this window while the backup is running.");
         warningLabel.setWrapText(true);
-        warningLabel.setStyle("-fx-text-fill: #d9a441; -fx-font-size: 10; -fx-font-family: 'JetBrains Mono';");
+        warningLabel.setStyle("-fx-text-fill: #d9a441; -fx-font-size: 10; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         Button cancelBtn = new Button("Cancel");
         cancelBtn.setStyle(secondaryBtnStyle() + " -fx-background-color: #2E0000;");
@@ -687,7 +700,7 @@ public class SettingsPanel extends VBox {
 
     private Label sectionLabel(String text) {
         Label l = new Label(text.toUpperCase());
-        l.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 9; -fx-font-family: 'JetBrains Mono';");
+        l.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 9; -fx-font-family: '" + ThemedStyles.font() + "';");
         return l;
     }
 
@@ -710,7 +723,7 @@ public class SettingsPanel extends VBox {
         row.setSpacing(12);
 
         Label label = new Label(text);
-        label.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 12; -fx-font-family: 'JetBrains Mono';");
+        label.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 12; -fx-font-family: '" + ThemedStyles.font() + "';");
         HBox.setHgrow(label, Priority.ALWAYS);
 
         // Flat toggle button instead of checkbox
@@ -732,22 +745,20 @@ public class SettingsPanel extends VBox {
 
     private String toggleOnStyle() {
         return "-fx-background-color: #ffffff; -fx-text-fill: #000000; " +
-               "-fx-font-family: 'JetBrains Mono'; -fx-font-size: 9; -fx-font-weight: bold; " +
+               "-fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 9; -fx-font-weight: bold; " +
                "-fx-background-radius: 4; -fx-cursor: hand;";
     }
 
     private String toggleOffStyle() {
-        return "-fx-background-color: #1a1a1a; -fx-text-fill: #ffffff; " +
-               "-fx-font-family: 'JetBrains Mono'; -fx-font-size: 9; -fx-font-weight: bold; " +
-               "-fx-background-radius: 4; -fx-cursor: hand; -fx-border-color: #2a2a2a; -fx-border-radius: 4; -fx-border-width: 0.5;";
+        return "-fx-background-color: " + ThemedStyles.btnBg() + "; -fx-text-fill: " + ThemedStyles.btnText() + "; " +
+               "-fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 9; -fx-font-weight: bold; " +
+               "-fx-background-radius: 4; -fx-cursor: hand; -fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 4; -fx-border-width: 0.5;";
     }
 
     private Label linkLabel(String text, String url) {
         Label l = new Label(text + " →");
-        l.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 12; -fx-font-family: 'JetBrains Mono'; -fx-cursor: hand;");
+        l.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 12; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-cursor: hand;");
         l.setOnMouseClicked(e -> BrowserUtil.open(url));
-        l.setOnMouseEntered(e -> l.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 12; -fx-font-family: 'JetBrains Mono'; -fx-cursor: hand;"));
-        l.setOnMouseExited(e  -> l.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 12; -fx-font-family: 'JetBrains Mono'; -fx-cursor: hand;"));
         return l;
     }
 
@@ -763,29 +774,29 @@ public class SettingsPanel extends VBox {
     }
 
     private String activeTabStyle() {
-        return "-fx-background-color: transparent; -fx-text-fill: #ffffff; " +
-               "-fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; " +
-               "-fx-border-color: transparent transparent #ffffff transparent; " +
+        return "-fx-background-color: transparent; -fx-text-fill: " + ThemedStyles.text() + "; " +
+               "-fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; " +
+               "-fx-border-color: transparent transparent " + ThemedStyles.text() + " transparent; " +
                "-fx-border-width: 0 0 1.5 0; -fx-padding: 8 14; -fx-cursor: hand;";
     }
 
     private String inactiveTabStyle() {
-        return "-fx-background-color: transparent; -fx-text-fill: #ffffff; " +
-               "-fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; " +
+        return "-fx-background-color: transparent; -fx-text-fill: " + ThemedStyles.text() + "; " +
+               "-fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; " +
                "-fx-border-color: transparent; -fx-padding: 8 14; -fx-cursor: hand;";
     }
 
     private String fieldStyle() {
-        return "-fx-background-color: #141414; -fx-text-fill: #ffffff; " +
-               "-fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; " +
+        return "-fx-background-color: #141414; -fx-text-fill: " + ThemedStyles.text() + "; " +
+               "-fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; " +
                "-fx-border-color: #222222; -fx-border-radius: 6; -fx-background-radius: 6; " +
                "-fx-padding: 9 12; -fx-prompt-text-fill: #333333;";
     }
 
     private String secondaryBtnStyle() {
-        return "-fx-background-color: #141414; -fx-text-fill: #ffffff; " +
-               "-fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; " +
-               "-fx-border-color: #222222; -fx-border-radius: 6; -fx-background-radius: 6; " +
+        return "-fx-background-color: " + ThemedStyles.btnBg() + "; -fx-text-fill: " + ThemedStyles.btnText() + "; " +
+               "-fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; " +
+               "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 6; -fx-background-radius: 6; " +
                "-fx-cursor: hand; -fx-padding: 8 16;";
     }
 

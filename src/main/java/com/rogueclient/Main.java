@@ -32,15 +32,13 @@ public class Main extends Application {
         SettingsManager settingsManager = new SettingsManager();
         settingsManager.load();
         LogBanner.print(settingsManager);
-
-        ThemeManager themeManager = ThemeManager.getInstance();
-        FontManager.ensureFoldersAndLoad();
+        FontManager.ensureDirectories();
 
         SplashScreen splash = new SplashScreen(() -> {
             DiscordRPC.start(settingsManager);
 
             Label titleLabel = new Label("Rogue Client");
-            titleLabel.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+            titleLabel.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
 
             Button minimizeBtn = new Button("-");
             minimizeBtn.setStyle(titleBtnStyle());
@@ -84,13 +82,7 @@ public class Main extends Application {
             closeBtn.setStyle(titleBtnStyle());
             closeBtn.setOnMouseEntered(e -> closeBtn.setStyle(closeBtnHoverStyle()));
             closeBtn.setOnMouseExited(e -> closeBtn.setStyle(titleBtnStyle()));
-            closeBtn.setOnAction(e -> {
-                if (settingsManager.hideLauncher) {
-                    TrayManager.minimizeToTray();
-                } else {
-                    TrayManager.quit();
-                }
-            });
+            closeBtn.setOnAction(e -> TrayManager.quit());
 
             HBox spacer = new HBox();
             HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -99,7 +91,7 @@ public class Main extends Application {
             titleBar.setMaxWidth(Double.MAX_VALUE);
             titleBar.setAlignment(Pos.CENTER_LEFT);
             titleBar.setPadding(new Insets(6, 8, 6, 12));
-            titleBar.setStyle("-fx-background-color: " + themeManager.titleBarColor + "; -fx-background-radius: 12 12 0 0;");
+            titleBar.setStyle("-fx-background-color: " + ThemedStyles.mainBg() + "; -fx-background-radius: 12 12 0 0;");
 
             titleBar.setOnMousePressed(e -> { xOffset = e.getSceneX(); yOffset = e.getSceneY(); });
             titleBar.setOnMouseDragged(e -> {
@@ -110,28 +102,32 @@ public class Main extends Application {
             });
 
             BorderPane root = new BorderPane();
-            root.setStyle("-fx-background-color: #080404; -fx-font-family: 'JetBrains Mono'; -fx-background-radius: 0 0 12 12;");
-            LeftPanel leftPanel = new LeftPanel(accountManager, settingsManager);
-            CenterPanel centerPanel = new CenterPanel(accountManager, settingsManager);
-            NewsPanel newsPanel = new NewsPanel();
-            root.setLeft(leftPanel);
-            root.setCenter(centerPanel);
-            root.setRight(newsPanel);
+            root.setStyle("-fx-background-color: " + ThemedStyles.mainBg() + "; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-background-radius: 0 0 12 12;");
+            root.setLeft(new LeftPanel(accountManager, settingsManager));
+            root.setCenter(new CenterPanel(accountManager, settingsManager));
+            root.setRight(new NewsPanel());
 
             VBox wrapper = new VBox(0, titleBar, root);
             VBox.setVgrow(root, Priority.ALWAYS);
-            wrapper.setStyle("-fx-background-color: #080404; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #1a1a1a; -fx-border-width: 1;");
+            wrapper.setStyle(
+                "-fx-background-color: " + ThemedStyles.mainBg() + "; -fx-background-radius: 12; -fx-border-radius: 12; " +
+                "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-width: 1;"
+            );
 
-            // Re-skin the launcher live whenever the Style settings are saved, without needing a restart.
-            // Only the title bar is theme-driven here - the root/wrapper background stays fixed
-            // since the visible surface is fully covered by the left/center/news panels anyway,
-            // and letting it follow the theme too caused rendering glitches around their edges.
-            themeManager.addListener(() -> {
-                titleBar.setStyle("-fx-background-color: " + themeManager.titleBarColor + "; -fx-background-radius: 12 12 0 0;");
-                leftPanel.refreshTheme();
-                centerPanel.refreshTheme();
-                newsPanel.refreshTheme();
-            });
+            // Long-lived chrome: re-apply these specific styles whenever the theme changes
+            // so the window frame updates live without needing a restart.
+            ThemeManager.addListener(() -> Platform.runLater(() -> {
+                titleLabel.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
+                titleBar.setStyle("-fx-background-color: " + ThemedStyles.mainBg() + "; -fx-background-radius: 12 12 0 0;");
+                root.setStyle("-fx-background-color: " + ThemedStyles.mainBg() + "; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-background-radius: 0 0 12 12;");
+                wrapper.setStyle(
+                    "-fx-background-color: " + ThemedStyles.mainBg() + "; -fx-background-radius: 12; -fx-border-radius: 12; " +
+                    "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-width: 1;"
+                );
+                minimizeBtn.setStyle(titleBtnStyle());
+                maximizeBtn.setStyle(titleBtnStyle());
+                closeBtn.setStyle(titleBtnStyle());
+            }));
 
             stage.initStyle(StageStyle.TRANSPARENT);
             Scene scene = new Scene(wrapper, 1320, 770);
@@ -243,15 +239,15 @@ public class Main extends Application {
     }
 
     private String titleBtnStyle() {
-        return "-fx-background-color: transparent; -fx-text-fill: #ffffff; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
+        return "-fx-background-color: transparent; -fx-text-fill: " + ThemedStyles.text() + "; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
     }
 
     private String titleBtnHoverStyle() {
-        return "-fx-background-color: #1a1a1a; -fx-text-fill: #ffffff; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
+        return "-fx-background-color: " + ThemedStyles.btnHoverBg() + "; -fx-text-fill: " + ThemedStyles.text() + "; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
     }
 
     private String closeBtnHoverStyle() {
-        return "-fx-background-color: #3a0000; -fx-text-fill: #ff4444; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
+        return "-fx-background-color: #3a0000; -fx-text-fill: #ff4444; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
     }
 
     public static void main(String[] args) {
@@ -259,6 +255,7 @@ public class Main extends Application {
             java.nio.file.Path logDir = java.nio.file.Paths.get(System.getProperty("user.home"), ".rogueclient", "logs");
             java.nio.file.Files.createDirectories(logDir);
             java.io.PrintStream logStream = new java.io.PrintStream(new java.io.FileOutputStream(logDir.resolve("launcher-latest.log").toFile(), false));
+            AppLog.register(logStream);
             System.setOut(logStream);
             System.setErr(logStream);
         } catch (Exception e) {

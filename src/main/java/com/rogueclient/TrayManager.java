@@ -160,7 +160,7 @@ public class TrayManager {
         box.setPadding(new Insets(4));
         box.setStyle(
             "-fx-background-color: #0f0f0f; -fx-background-radius: 8; " +
-            "-fx-border-color: #1a1a1a; -fx-border-radius: 8; -fx-border-width: 1;"
+            "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 8; -fx-border-width: 1;"
         );
 
         trayMenu = new Popup();
@@ -181,8 +181,8 @@ public class TrayManager {
     }
 
     private static String trayMenuItemStyle() {
-        return "-fx-background-color: transparent; -fx-text-fill: #ffffff; " +
-            "-fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; " +
+        return "-fx-background-color: transparent; -fx-text-fill: " + ThemedStyles.text() + "; " +
+            "-fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; " +
             "-fx-cursor: hand; -fx-padding: 8 14; -fx-alignment: CENTER_LEFT; " +
             "-fx-background-radius: 6;";
     }
@@ -195,7 +195,7 @@ public class TrayManager {
         String bg = destructive ? "#3a0000" : "#1a1a1a";
         String fg = destructive ? "#ff4444" : "#ffffff";
         return "-fx-background-color: " + bg + "; -fx-text-fill: " + fg + "; " +
-            "-fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; " +
+            "-fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; " +
             "-fx-cursor: hand; -fx-padding: 8 14; -fx-alignment: CENTER_LEFT; " +
             "-fx-background-radius: 6;";
     }

@@ -23,18 +23,18 @@ public class LaunchLogWindow {
         stage = new Stage();
 
         VBox root = new VBox(12);
-        root.setStyle("-fx-background-color: #080404;");
+        root.setStyle("-fx-background-color: " + ThemedStyles.mainBg() + ";");
         root.setPadding(new Insets(20));
 
         tipsBox = new VBox(6);
 
         logArea = new TextArea();
-        logArea.getStyleClass().add("rogue-scroll");
+        logArea.getStyleClass().add("rocket-scroll");
         logArea.setStyle(
-            "-fx-background-color: #080404; -fx-text-fill: #ffffff; " +
-            "-fx-font-family: 'JetBrains Mono'; -fx-font-size: 11; " +
-            "-fx-border-color: #1a1a1a; -fx-border-radius: 6; -fx-background-radius: 6; " +
-            "-fx-control-inner-background: #080404;"
+            "-fx-background-color: " + ThemedStyles.mainBg() + "; -fx-text-fill: " + ThemedStyles.text() + "; " +
+            "-fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 11; " +
+            "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 6; -fx-background-radius: 6; " +
+            "-fx-control-inner-background: " + ThemedStyles.mainBg() + ";"
         );
         logArea.setEditable(false);
         logArea.setWrapText(true);
@@ -42,8 +42,8 @@ public class LaunchLogWindow {
 
         Button copyBtn = new Button("Copy to Clipboard");
         copyBtn.setStyle(
-            "-fx-background-color: #141414; -fx-text-fill: #ffffff; " +
-            "-fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; " +
+            "-fx-background-color: #141414; -fx-text-fill: " + ThemedStyles.text() + "; " +
+            "-fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; " +
             "-fx-border-color: #222222; -fx-border-radius: 6; -fx-background-radius: 6; " +
             "-fx-cursor: hand; -fx-padding: 8 16;"
         );
@@ -56,8 +56,8 @@ public class LaunchLogWindow {
 
         Button uploadBtn = new Button("Upload Log");
         uploadBtn.setStyle(
-            "-fx-background-color: #141414; -fx-text-fill: #ffffff; " +
-            "-fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; " +
+            "-fx-background-color: #141414; -fx-text-fill: " + ThemedStyles.text() + "; " +
+            "-fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; " +
             "-fx-border-color: #222222; -fx-border-radius: 6; -fx-background-radius: 6; " +
             "-fx-cursor: hand; -fx-padding: 8 16;"
         );
@@ -96,8 +96,8 @@ public class LaunchLogWindow {
 
         Button closeBtn = new Button("Close");
         closeBtn.setStyle(
-            "-fx-background-color: #141414; -fx-text-fill: #ffffff; " +
-            "-fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; " +
+            "-fx-background-color: #141414; -fx-text-fill: " + ThemedStyles.text() + "; " +
+            "-fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; " +
             "-fx-border-color: #222222; -fx-border-radius: 6; -fx-background-radius: 6; " +
             "-fx-cursor: hand; -fx-padding: 8 16;"
         );
@@ -188,11 +188,11 @@ public class LaunchLogWindow {
 
     private void addTip(String title, String body) {
         Label titleLabel = new Label("\u26A0 " + title);
-        titleLabel.setStyle("-fx-text-fill: #e0a030; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; -fx-font-weight: bold;");
+        titleLabel.setStyle("-fx-text-fill: #e0a030; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; -fx-font-weight: bold;");
 
         Label bodyLabel = new Label(body);
         bodyLabel.setWrapText(true);
-        bodyLabel.setStyle("-fx-text-fill: #cccccc; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 11;");
+        bodyLabel.setStyle("-fx-text-fill: #cccccc; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 11;");
 
         VBox card = new VBox(4, titleLabel, bodyLabel);
         card.setPadding(new Insets(10));

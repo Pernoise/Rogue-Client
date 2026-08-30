@@ -20,10 +20,10 @@ public class AuthPanel extends VBox {
         this.accountManager = accountManager;
         setPadding(new Insets(20));
         setSpacing(12);
-        setStyle("-fx-background-color: #0f0f0f;");
+        setStyle("-fx-background-color: " + ThemedStyles.panelBg() + ";");
 
         Label title = new Label("Accounts");
-        title.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 16; -fx-font-family: 'JetBrains Mono'; -fx-font-weight: bold;");
+        title.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 16; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-weight: bold;");
 
         Button msTab  = new Button("Microsoft");
         Button elyTab = new Button("Ely.by");
@@ -80,15 +80,15 @@ public class AuthPanel extends VBox {
         panel.setPadding(new Insets(16, 0, 0, 0));
 
         Label info = new Label("Sign in with your Minecraft account");
-        info.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        info.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         info.setWrapText(true);
 
         Label codeLabel = new Label();
-        codeLabel.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 28; -fx-font-family: 'JetBrains Mono'; -fx-font-weight: bold;");
+        codeLabel.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 28; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-weight: bold;");
         codeLabel.setVisible(false);
 
         Button copyBtn = new Button("Login with Microsoft");
-        copyBtn.setStyle("-fx-background-color: #1a1a1a; -fx-text-fill: #ffffff; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 11; -fx-cursor: hand; -fx-padding: 6 12; -fx-border-color: #2a2a2a; -fx-border-radius: 6; -fx-background-radius: 6;");
+        copyBtn.setStyle("-fx-background-color: #1a1a1a; -fx-text-fill: " + ThemedStyles.text() + "; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 11; -fx-cursor: hand; -fx-padding: 6 12; -fx-border-color: #2a2a2a; -fx-border-radius: 6; -fx-background-radius: 6;");
         copyBtn.setVisible(false);
         copyBtn.setOnAction(e -> {
             javafx.scene.input.ClipboardContent cc = new javafx.scene.input.ClipboardContent();
@@ -98,7 +98,7 @@ public class AuthPanel extends VBox {
         });
 
         Label status = new Label();
-        status.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        status.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         status.setWrapText(true);
 
         Button loginBtn = new Button("Login with Microsoft");
@@ -124,7 +124,7 @@ public class AuthPanel extends VBox {
                     }));
                     accountManager.addAccount(account);
                     Platform.runLater(() -> {
-                        status.setStyle("-fx-text-fill: #4caf50; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+                        status.setStyle("-fx-text-fill: #4caf50; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
                         status.setText("Logged in as " + account.username);
                         codeLabel.setVisible(false);
                         copyBtn.setVisible(false);
@@ -133,7 +133,7 @@ public class AuthPanel extends VBox {
                     });
                 } catch (Exception ex) {
                     Platform.runLater(() -> {
-                        status.setStyle("-fx-text-fill: #f44336; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+                        status.setStyle("-fx-text-fill: #f44336; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
                         status.setText("Error: " + ex.getMessage());
                         codeLabel.setVisible(false);
                         copyBtn.setVisible(false);
@@ -153,18 +153,18 @@ public class AuthPanel extends VBox {
         panel.setPadding(new Insets(16, 0, 0, 0));
 
         Label info = new Label("Sign in with your Ely.by account.");
-        info.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        info.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         TextField usernameField = new TextField();
         usernameField.setPromptText("Username or Email");
-        usernameField.setStyle("-fx-background-color: #141414; -fx-text-fill: #ffffff; -fx-prompt-text-fill: #333333; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; -fx-border-color: #1a1a1a; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 12;");
+        usernameField.setStyle("-fx-background-color: #141414; -fx-text-fill: " + ThemedStyles.text() + "; -fx-prompt-text-fill: #333333; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; -fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 12;");
 
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Password");
-        passwordField.setStyle("-fx-background-color: #141414; -fx-text-fill: #ffffff; -fx-prompt-text-fill: #333333; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; -fx-border-color: #1a1a1a; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 12;");
+        passwordField.setStyle("-fx-background-color: #141414; -fx-text-fill: " + ThemedStyles.text() + "; -fx-prompt-text-fill: #333333; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; -fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 12;");
 
         Label status = new Label();
-        status.setStyle("-fx-text-fill: #f44336; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        status.setStyle("-fx-text-fill: #f44336; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         status.setWrapText(true);
 
         Button loginBtn = new Button("Login with Ely.by");
@@ -184,7 +184,7 @@ public class AuthPanel extends VBox {
                     AccountManager.Account account = ElyByAuth.login(username, password);
                     accountManager.addAccount(account);
                     Platform.runLater(() -> {
-                        status.setStyle("-fx-text-fill: #4caf50; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+                        status.setStyle("-fx-text-fill: #4caf50; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
                         status.setText("Logged in as " + account.username);
                         loginBtn.setText("Login with Ely.by");
                         loginBtn.setDisable(false);
@@ -193,7 +193,7 @@ public class AuthPanel extends VBox {
                     });
                 } catch (Exception ex) {
                     Platform.runLater(() -> {
-                        status.setStyle("-fx-text-fill: #f44336; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+                        status.setStyle("-fx-text-fill: #f44336; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
                         status.setText("Error: " + ex.getMessage());
                         loginBtn.setText("Login with Ely.by");
                         loginBtn.setDisable(false);
@@ -220,18 +220,18 @@ public class AuthPanel extends VBox {
             row.setStyle("-fx-background-color: #141414; -fx-background-radius: 6; -fx-padding: 8 12;");
 
             Label name = new Label(acc.username + " (" + acc.type + ")");
-            name.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+            name.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
             HBox.setHgrow(name, Priority.ALWAYS);
 
             Button selectBtn = new Button("Select");
-            selectBtn.setStyle("-fx-background-color: #1a1a1a; -fx-text-fill: #ffffff; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 10; -fx-cursor: hand; -fx-padding: 4 8; -fx-border-color: #2a2a2a; -fx-border-radius: 4; -fx-background-radius: 4;");
+            selectBtn.setStyle("-fx-background-color: #1a1a1a; -fx-text-fill: " + ThemedStyles.text() + "; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 10; -fx-cursor: hand; -fx-padding: 4 8; -fx-border-color: #2a2a2a; -fx-border-radius: 4; -fx-background-radius: 4;");
             selectBtn.setOnAction(e -> {
                 accountManager.setSelected(acc.uuid);
                 selectBtn.setText("Selected");
             });
 
             Button removeBtn = new Button("Remove");
-            removeBtn.setStyle("-fx-background-color: #1a0000; -fx-text-fill: #663333; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 10; -fx-cursor: hand; -fx-padding: 4 8; -fx-border-color: #2a0000; -fx-border-radius: 4; -fx-background-radius: 4;");
+            removeBtn.setStyle("-fx-background-color: #1a0000; -fx-text-fill: #663333; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 10; -fx-cursor: hand; -fx-padding: 4 8; -fx-border-color: #2a0000; -fx-border-radius: 4; -fx-background-radius: 4;");
             removeBtn.setOnAction(e -> {
                 accountManager.removeAccount(acc.uuid);
                 refreshLoggedIn(panel);
@@ -243,20 +243,20 @@ public class AuthPanel extends VBox {
 
         if (accountManager.getAccounts().isEmpty()) {
             Label empty = new Label("No accounts logged in.");
-            empty.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+            empty.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
             panel.getChildren().add(empty);
         }
     }
 
     private String activeTabStyle() {
-        return "-fx-background-color: transparent; -fx-text-fill: #ffffff; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; -fx-cursor: hand; -fx-border-color: transparent transparent #ffffff transparent; -fx-border-width: 0 0 1 0; -fx-padding: 6 12; -fx-background-radius: 0;";
+        return "-fx-background-color: transparent; -fx-text-fill: " + ThemedStyles.text() + "; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; -fx-cursor: hand; -fx-border-color: transparent transparent " + ThemedStyles.text() + " transparent; -fx-border-width: 0 0 1 0; -fx-padding: 6 12; -fx-background-radius: 0;";
     }
 
     private String inactiveTabStyle() {
-        return "-fx-background-color: transparent; -fx-text-fill: #ffffff; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 12; -fx-cursor: hand; -fx-border-color: transparent; -fx-padding: 6 12; -fx-background-radius: 0;";
+        return "-fx-background-color: transparent; -fx-text-fill: " + ThemedStyles.text() + "; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; -fx-cursor: hand; -fx-border-color: transparent; -fx-padding: 6 12; -fx-background-radius: 0;";
     }
 
     private String primaryBtnStyle() {
-        return "-fx-background-color: #ffffff; -fx-text-fill: #000000; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 13; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 12 24; -fx-background-radius: 6;";
+        return "-fx-background-color: #ffffff; -fx-text-fill: #000000; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 13; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 12 24; -fx-background-radius: 6;";
     }
 }

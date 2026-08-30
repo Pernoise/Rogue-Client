@@ -1,59 +1,59 @@
 
 /*Scrollbars */
-.rogue-scroll {
+.rocket-scroll {
     -fx-background-color: transparent;
 }
 
-.rogue-scroll > .viewport {
+.rocket-scroll > .viewport {
     -fx-background-color: transparent;
 }
 
-.rogue-scroll .scroll-bar:vertical,
-.rogue-scroll .scroll-bar:horizontal {
+.rocket-scroll .scroll-bar:vertical,
+.rocket-scroll .scroll-bar:horizontal {
     -fx-background-color: transparent;
     -fx-pref-width: 8;
     -fx-pref-height: 8;
 }
 
-.rogue-scroll .scroll-bar:vertical .track,
-.rogue-scroll .scroll-bar:horizontal .track {
+.rocket-scroll .scroll-bar:vertical .track,
+.rocket-scroll .scroll-bar:horizontal .track {
     -fx-background-color: #141414;
     -fx-background-radius: 6;
     -fx-border-color: transparent;
 }
 
-.rogue-scroll .scroll-bar:vertical .thumb,
-.rogue-scroll .scroll-bar:horizontal .thumb {
+.rocket-scroll .scroll-bar:vertical .thumb,
+.rocket-scroll .scroll-bar:horizontal .thumb {
     -fx-background-color: #2a2a2a;
     -fx-background-radius: 6;
 }
 
-.rogue-scroll .scroll-bar:vertical .thumb:hover,
-.rogue-scroll .scroll-bar:horizontal .thumb:hover,
-.rogue-scroll .scroll-bar:vertical .thumb:pressed,
-.rogue-scroll .scroll-bar:horizontal .thumb:pressed {
+.rocket-scroll .scroll-bar:vertical .thumb:hover,
+.rocket-scroll .scroll-bar:horizontal .thumb:hover,
+.rocket-scroll .scroll-bar:vertical .thumb:pressed,
+.rocket-scroll .scroll-bar:horizontal .thumb:pressed {
     -fx-background-color: #3a3a3a;
 }
 
-.rogue-scroll .scroll-bar .increment-button,
-.rogue-scroll .scroll-bar .decrement-button {
+.rocket-scroll .scroll-bar .increment-button,
+.rocket-scroll .scroll-bar .decrement-button {
     -fx-background-color: transparent;
     -fx-padding: 0;
 }
 
-.rogue-scroll .scroll-bar .increment-arrow,
-.rogue-scroll .scroll-bar .decrement-arrow {
+.rocket-scroll .scroll-bar .increment-arrow,
+.rocket-scroll .scroll-bar .decrement-arrow {
     -fx-background-color: transparent;
     -fx-shape: " ";
     -fx-padding: 0;
 }
 
-.rogue-scroll .corner {
+.rocket-scroll .corner {
     -fx-background-color: transparent;
 }
 
 /* Sliders (RAM allocation etc) */
-.rogue-slider .track {
+.rocket-slider .track {
     -fx-background-color: #141414;
     -fx-background-radius: 6;
     -fx-border-color: #222222;
@@ -61,11 +61,11 @@
     -fx-pref-height: 6;
 }
 
-.rogue-slider .axis {
+.rocket-slider .axis {
     -fx-tick-label-fill: #ffffff;
 }
 
-.rogue-slider .thumb {
+.rocket-slider .thumb {
     -fx-background-color: #ffffff;
     -fx-background-radius: 50%;
     -fx-pref-width: 14;
@@ -73,7 +73,98 @@
     -fx-effect: dropshadow(gaussian, rgba(255,255,255,0.25), 6, 0.3, 0, 0);
 }
 
-.rogue-slider .thumb:hover,
-.rogue-slider .thumb:pressed {
+.rocket-slider .thumb:hover,
+.rocket-slider .thumb:pressed {
     -fx-background-color: #e0e0e0;
+}
+
+/* ColorPicker control itself (the closed swatch + dropdown arrow, used throughout Style settings) */
+.color-picker {
+    -fx-background-color: #141414;
+    -fx-background-radius: 6;
+    -fx-border-color: #222222;
+    -fx-border-radius: 6;
+}
+
+.color-picker:hover {
+    -fx-background-color: #1a1a1a;
+}
+
+.color-picker .color-picker-label {
+    -fx-text-fill: #ffffff;
+    -fx-padding: 4 6;
+}
+
+.color-picker.split-button > .color-picker-label {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6 0 0 6;
+}
+
+.color-picker.split-button > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0 6 6 0;
+}
+
+.color-picker .arrow {
+    -fx-background-color: #ffffff;
+}
+
+/* ColorPicker dropdown popup - replaces the default light-gray swatch grid */
+.color-palette {
+    -fx-background-color: #141414;
+    -fx-border-color: #222222;
+    -fx-border-width: 1;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-padding: 8;
+}
+
+.color-palette .label {
+    -fx-text-fill: #ffffff;
+}
+
+.color-palette .custom-color-link,
+.color-palette .hyperlink {
+    -fx-text-fill: #ffffff;
+    -fx-border-color: transparent;
+    -fx-underline: false;
+}
+
+.color-palette .custom-color-link:hover,
+.color-palette .hyperlink:hover {
+    -fx-text-fill: #aaaaaa;
+}
+
+.color-palette .separator .line {
+    -fx-border-color: #222222;
+}
+
+/* "Custom Color..." dialog that opens from the link above */
+.custom-color-dialog {
+    -fx-background-color: #141414;
+}
+
+.custom-color-dialog .label {
+    -fx-text-fill: #ffffff;
+}
+
+.custom-color-dialog .text-field {
+    -fx-background-color: #0f0f0f;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #222222;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.custom-color-dialog .button {
+    -fx-background-color: #1a1a1a;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #222222;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.custom-color-dialog .button:hover {
+    -fx-background-color: #222222;
 }

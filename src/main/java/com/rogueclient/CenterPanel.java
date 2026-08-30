@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -33,6 +34,8 @@ public class CenterPanel extends VBox {
     private InstanceManager.Instance currentInstance = null;
     private boolean fabricMode = true;
 
+    private Label nameLabel;
+    private Label quoteLabel;
     private HBox recentRow;
     private Button selectBtn;
     private HBox playRow;
@@ -41,8 +44,6 @@ public class CenterPanel extends VBox {
     private VBox dropdownContent;
     private ScrollPane scrollPane;
     private ImageView loaderIcon;
-    private Label headlineLabel;
-    private Label quoteLabel;
 
     private static final String[] VERSIONS = {
         "26.2", "26.1.2", "26.1.1", "26.1",
@@ -66,18 +67,16 @@ public class CenterPanel extends VBox {
         setAlignment(Pos.CENTER);
         setPadding(new Insets(28, 36, 22, 36));
         setSpacing(6);
-        setStyle(panelStyle());
+        applyPanelStyle();
 
-        Label name = new Label("Rogue Client");
-        headlineLabel = name;
-        applyHeadlineStyle(name);
+        nameLabel = new Label("Rogue Client");
+        applyHeadlineStyle();
 
-        Label quote = new Label(loadRandomQuote());
-        quoteLabel = quote;
-        applyQuoteStyle(quote);
-        quote.setWrapText(true);
-        quote.setMaxWidth(420);
-        quote.setAlignment(Pos.CENTER);
+        quoteLabel = new Label(loadRandomQuote());
+        applyQuoteStyle();
+        quoteLabel.setWrapText(true);
+        quoteLabel.setMaxWidth(420);
+        quoteLabel.setAlignment(Pos.CENTER);
 
         VBox topSpacer = new VBox();
         VBox.setVgrow(topSpacer, Priority.ALWAYS);
@@ -86,7 +85,7 @@ public class CenterPanel extends VBox {
         recentRow.setAlignment(Pos.CENTER);
         recentRow.setMaxWidth(420);
         recentRow.setPadding(new Insets(10));
-        recentRow.setStyle("-fx-border-color: #1a1a1a; -fx-border-width: 1; -fx-border-radius: 10; -fx-background-radius: 10;");
+        applyRecentRowStyle();
 
         VBox bottomSpacer = new VBox();
         VBox.setVgrow(bottomSpacer, Priority.ALWAYS);
@@ -101,8 +100,8 @@ public class CenterPanel extends VBox {
         playBtn.setStyle(playBtnStyle());
         playBtn.setMaxWidth(Double.MAX_VALUE);
         HBox.setHgrow(playBtn, Priority.ALWAYS);
-        playBtn.setOnMouseEntered(e -> playBtn.setStyle(playBtnHoverStyle()));
-        playBtn.setOnMouseExited(e -> playBtn.setStyle(playBtnStyle()));
+        playBtn.setOnMouseEntered(e -> { if (!playBtn.isDisable()) playBtn.setStyle(playBtnHoverStyle()); });
+        playBtn.setOnMouseExited(e -> { if (!playBtn.isDisable()) playBtn.setStyle(playBtnStyle()); });
         playBtn.setOnAction(e -> handlePlay(playBtn));
 
         versionBtn = new Button("v");
@@ -127,11 +126,11 @@ public class CenterPanel extends VBox {
         dropdownContent.setPadding(new Insets(4));
 
         scrollPane = new ScrollPane(dropdownContent);
-        scrollPane.getStyleClass().add("rogue-scroll");
+        scrollPane.getStyleClass().add("rocket-scroll");
         scrollPane.setMaxHeight(220);
         scrollPane.setMaxWidth(420);
         scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background: #0d0d0d; -fx-background-color: #0d0d0d; -fx-border-color: #1a1a1a; -fx-border-radius: 7; -fx-background-radius: 7;");
+        applyScrollPaneStyle();
         scrollPane.setVisible(false);
         scrollPane.setManaged(false);
 
@@ -139,7 +138,59 @@ public class CenterPanel extends VBox {
 
         refreshRecentRow();
 
-        getChildren().addAll(name, quote, topSpacer, recentRow, bottomSpacer, selectBtn, playRow, scrollPane);
+        getChildren().addAll(nameLabel, quoteLabel, topSpacer, recentRow, bottomSpacer, selectBtn, playRow, scrollPane);
+
+        ThemeManager.addListener(() -> Platform.runLater(this::applyTheme));
+    }
+
+    private void applyPanelStyle() {
+        setStyle("-fx-background-color: " + ThemedStyles.centerBg() + ";");
+    }
+
+    private void applyHeadlineStyle() {
+        Font customFont = ThemedStyles.headlineFont(ThemedStyles.headlineSize());
+        if (customFont != null) {
+            nameLabel.setFont(customFont);
+            nameLabel.setStyle("-fx-text-fill: " + ThemedStyles.headlineColor() + "; -fx-opacity: 0.88;");
+        } else {
+            nameLabel.setStyle(
+                "-fx-text-fill: " + ThemedStyles.headlineColor() + "; -fx-font-size: " + ThemedStyles.headlineSize() + "; " +
+                "-fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-weight: bold; -fx-opacity: 0.88;"
+            );
+        }
+    }
+
+    private void applyQuoteStyle() {
+        quoteLabel.setStyle(
+            "-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "'; " +
+            "-fx-font-style: italic; -fx-font-weight: bold;"
+        );
+    }
+
+    private void applyRecentRowStyle() {
+        recentRow.setStyle(
+            "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-width: 1; -fx-border-radius: 10; -fx-background-radius: 10;"
+        );
+    }
+
+    private void applyScrollPaneStyle() {
+        scrollPane.setStyle(
+            "-fx-background: " + ThemedStyles.panelBg() + "; -fx-background-color: " + ThemedStyles.panelBg() + "; " +
+            "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 7; -fx-background-radius: 7;"
+        );
+    }
+
+    /** Re-applies every themed style already on screen, so an open launcher window updates live when the theme is saved. */
+    private void applyTheme() {
+        applyPanelStyle();
+        applyHeadlineStyle();
+        applyQuoteStyle();
+        applyRecentRowStyle();
+        applyScrollPaneStyle();
+        if (!playBtn.isDisable()) playBtn.setStyle(playBtnStyle());
+        selectBtn.setStyle(playBtnStyle());
+        versionBtn.setStyle(versionBtnStyle());
+        refreshRecentRow();
     }
 
     private void toggleDropdown() {
@@ -166,10 +217,10 @@ public class CenterPanel extends VBox {
         }
 
         Label newInstanceRow = new Label("+  New instance");
-        newInstanceRow.setStyle(dropdownRowStyle() + " -fx-text-fill: #888888;");
+        newInstanceRow.setStyle(dropdownRowStyle() + " -fx-text-fill: " + ThemedStyles.textSecondary() + ";");
         newInstanceRow.setMaxWidth(Double.MAX_VALUE);
-        newInstanceRow.setOnMouseEntered(e -> newInstanceRow.setStyle(dropdownRowHoverStyle() + " -fx-text-fill: #ffffff;"));
-        newInstanceRow.setOnMouseExited(e -> newInstanceRow.setStyle(dropdownRowStyle() + " -fx-text-fill: #888888;"));
+        newInstanceRow.setOnMouseEntered(e -> newInstanceRow.setStyle(dropdownRowHoverStyle() + " -fx-text-fill: " + ThemedStyles.text() + ";"));
+        newInstanceRow.setOnMouseExited(e -> newInstanceRow.setStyle(dropdownRowStyle() + " -fx-text-fill: " + ThemedStyles.textSecondary() + ";"));
         newInstanceRow.setOnMouseClicked(e -> showVersionPicker());
         dropdownContent.getChildren().add(newInstanceRow);
     }
@@ -199,11 +250,11 @@ public class CenterPanel extends VBox {
     }
 
     private String dropdownRowStyle() {
-        return "-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono'; -fx-padding: 6 10;";
+        return "-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-padding: 6 10;";
     }
 
     private String dropdownRowHoverStyle() {
-        return dropdownRowStyle() + " -fx-background-color: #161616; -fx-background-radius: 5;";
+        return dropdownRowStyle() + " -fx-background-color: " + ThemedStyles.btnHoverBg() + "; -fx-background-radius: 5;";
     }
 
     private void selectInstance(InstanceManager.Instance inst) {
@@ -245,19 +296,19 @@ public class CenterPanel extends VBox {
         StackPane iconBox = new StackPane(iconView);
         iconBox.setPrefSize(28, 28);
         iconBox.setMaxSize(28, 28);
-        iconBox.setStyle("-fx-background-color: " + (isSelected ? "#1f1f1f" : "#161616") + "; -fx-background-radius: 6;");
+        iconBox.setStyle("-fx-background-color: " + (isSelected ? ThemedStyles.btnPressedBg() : ThemedStyles.btnHoverBg()) + "; -fx-background-radius: 6;");
 
         Label nameLabel = new Label(inst.name);
-        nameLabel.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        nameLabel.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         Label timeLabel = new Label(relativeTime(inst.lastPlayed));
-        timeLabel.setStyle("-fx-text-fill: " + (isSelected ? "#aaaaaa" : "#888888") + "; -fx-font-size: 9; -fx-font-family: 'JetBrains Mono';");
+        timeLabel.setStyle("-fx-text-fill: " + ThemedStyles.textSecondary() + "; -fx-font-size: 9; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         VBox tile = new VBox(6, iconBox, nameLabel, timeLabel);
         tile.setPadding(new Insets(10));
         tile.setStyle(
-            "-fx-background-color: " + (isSelected ? "#161616" : "#0f0f0f") + "; " +
-            "-fx-border-color: " + (isSelected ? "#ffffff" : "#1a1a1a") + "; " +
+            "-fx-background-color: " + (isSelected ? ThemedStyles.btnHoverBg() : ThemedStyles.btnBg()) + "; " +
+            "-fx-border-color: " + (isSelected ? ThemedStyles.text() : ThemedStyles.border()) + "; " +
             "-fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"
         );
         tile.setPrefWidth(120);
@@ -278,76 +329,43 @@ public class CenterPanel extends VBox {
     }
 
     private String playBtnStyle() {
-        ThemeManager t = ThemeManager.getInstance();
-        return "-fx-background-color: " + t.buttonColor + "; -fx-text-fill: " + t.buttonTextColor + "; " +
-            "-fx-font-size: 13; -fx-font-weight: bold; -fx-font-family: '" + t.textFontFamilyOrDefault() + "'; " +
-            "-fx-border-color: #1a1a1a; -fx-border-width: 1; " +
+        return "-fx-background-color: " + ThemedStyles.btnBg() + "; -fx-text-fill: " + ThemedStyles.btnText() + "; " +
+            "-fx-font-size: 13; -fx-font-weight: bold; -fx-font-family: '" + ThemedStyles.font() + "'; " +
+            "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-width: 1; " +
             "-fx-background-radius: 8; -fx-border-radius: 8; " +
             "-fx-cursor: hand; -fx-padding: 16 24; -fx-opacity: 0.88;";
     }
 
     private String playBtnHoverStyle() {
-        ThemeManager t = ThemeManager.getInstance();
-        return "-fx-background-color: " + t.buttonHoverColor + "; -fx-text-fill: " + t.buttonTextColor + "; " +
-            "-fx-font-size: 13; -fx-font-weight: bold; -fx-font-family: '" + t.textFontFamilyOrDefault() + "'; " +
-            "-fx-border-color: #1a1a1a; -fx-border-width: 1; " +
+        return "-fx-background-color: " + ThemedStyles.btnHoverBg() + "; -fx-text-fill: " + ThemedStyles.btnText() + "; " +
+            "-fx-font-size: 13; -fx-font-weight: bold; -fx-font-family: '" + ThemedStyles.font() + "'; " +
+            "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-width: 1; " +
             "-fx-background-radius: 8; -fx-border-radius: 8; " +
             "-fx-cursor: hand; -fx-padding: 16 24; -fx-opacity: 0.88;";
     }
 
+    private String playBtnDisabledStyle() {
+        return "-fx-background-color: " + ThemedStyles.btnDisabledBg() + "; -fx-text-fill: " + ThemedStyles.btnDisabledText() + "; " +
+            "-fx-font-size: 13; -fx-font-weight: bold; -fx-font-family: '" + ThemedStyles.font() + "'; " +
+            "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-width: 1; " +
+            "-fx-background-radius: 8; -fx-border-radius: 8; " +
+            "-fx-padding: 16 24; -fx-opacity: 0.88;";
+    }
+
     private String versionBtnStyle() {
-        ThemeManager t = ThemeManager.getInstance();
-        return "-fx-background-color: " + t.buttonColor + "; -fx-text-fill: " + t.buttonTextColor + "; " +
+        return "-fx-background-color: " + ThemedStyles.btnBg() + "; -fx-text-fill: " + ThemedStyles.btnText() + "; " +
             "-fx-font-size: 13; -fx-font-weight: bold; " +
-            "-fx-border-color: #1a1a1a; -fx-border-width: 1; " +
+            "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-width: 1; " +
             "-fx-border-radius: 8; -fx-background-radius: 8; " +
             "-fx-cursor: hand; -fx-min-width: 40; -fx-padding: 16 10;";
     }
 
     private String versionBtnHoverStyle() {
-        ThemeManager t = ThemeManager.getInstance();
-        return "-fx-background-color: " + t.buttonHoverColor + "; -fx-text-fill: " + t.buttonTextColor + "; " +
+        return "-fx-background-color: " + ThemedStyles.btnHoverBg() + "; -fx-text-fill: " + ThemedStyles.btnText() + "; " +
             "-fx-font-size: 13; -fx-font-weight: bold; " +
-            "-fx-border-color: #1a1a1a; -fx-border-width: 1; " +
+            "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-width: 1; " +
             "-fx-border-radius: 8; -fx-background-radius: 8; " +
             "-fx-cursor: hand; -fx-min-width: 40; -fx-padding: 16 10;";
-    }
-
-    private String panelStyle() {
-        return "-fx-background-color: " + ThemeManager.getInstance().centerPanelColor + ";";
-    }
-
-    private void applyHeadlineStyle(Label label) {
-        ThemeManager t = ThemeManager.getInstance();
-        Font customFont = null;
-        if (t.headlineFontFamily != null && !t.headlineFontFamily.isEmpty()) {
-            customFont = Font.font(t.headlineFontFamily, t.headlineFontSize);
-        } else {
-            customFont = Font.loadFont(getClass().getResourceAsStream("/fonts/gondens-demo/Gondens DEMO.otf"), t.headlineFontSize);
-        }
-        if (customFont != null) {
-            label.setFont(customFont);
-            label.setStyle("-fx-text-fill: " + t.headlineColor + "; -fx-opacity: 0.88;");
-        } else {
-            label.setStyle("-fx-text-fill: " + t.headlineColor + "; -fx-font-size: " + t.headlineFontSize +
-                "; -fx-font-family: 'JetBrains Mono'; -fx-font-weight: bold; -fx-opacity: 0.88;");
-        }
-    }
-
-    private void applyQuoteStyle(Label label) {
-        ThemeManager t = ThemeManager.getInstance();
-        label.setStyle("-fx-text-fill: " + t.textColor + "; -fx-font-size: 11; -fx-font-family: '" +
-            t.textFontFamilyOrDefault() + "'; -fx-font-style: italic; -fx-font-weight: bold;");
-    }
-
-    /** Re-applies the current theme's colors/fonts to this panel without rebuilding it. */
-    public void refreshTheme() {
-        setStyle(panelStyle());
-        if (headlineLabel != null) applyHeadlineStyle(headlineLabel);
-        if (quoteLabel != null) applyQuoteStyle(quoteLabel);
-        if (playBtn != null) playBtn.setStyle(playBtnStyle());
-        if (selectBtn != null) selectBtn.setStyle(playBtnStyle());
-        if (versionBtn != null) versionBtn.setStyle(versionBtnStyle());
     }
 
     private void setLoaderIcon(ImageView iv, boolean fabric) {
@@ -368,7 +386,7 @@ public class CenterPanel extends VBox {
             playBtn.setText("Login first!");
             playBtn.setStyle(
                 "-fx-background-color: #1a0000; -fx-text-fill: #f44336; " +
-                "-fx-font-size: 13; -fx-font-weight: bold; -fx-font-family: 'JetBrains Mono'; " +
+                "-fx-font-size: 13; -fx-font-weight: bold; -fx-font-family: '" + ThemedStyles.font() + "'; " +
                 "-fx-border-color: #2a0000; -fx-border-width: 1 0 1 0; " +
                 "-fx-background-radius: 0; -fx-cursor: hand; -fx-padding: 16 24;"
             );
@@ -381,6 +399,7 @@ public class CenterPanel extends VBox {
 
         playBtn.setDisable(true);
         playBtn.setText("Launching...");
+        playBtn.setStyle(playBtnDisabledStyle());
 
         LaunchLogWindow logWindow = new LaunchLogWindow();
         logWindow.show();
@@ -404,6 +423,7 @@ public class CenterPanel extends VBox {
                 javafx.application.Platform.runLater(() -> {
                     playBtn.setText(playLabel);
                     playBtn.setDisable(false);
+                    playBtn.setStyle(playBtnStyle());
                     logWindow.setTitle("Rogue Client - Minecraft Running");
                     refreshRecentRow();
 
@@ -417,6 +437,7 @@ public class CenterPanel extends VBox {
                 javafx.application.Platform.runLater(() -> {
                     playBtn.setText("Launch failed!");
                     playBtn.setDisable(false);
+                    playBtn.setStyle(playBtnStyle());
                     logWindow.appendLog("ERROR: " + ex.getMessage());
                     logWindow.setTitle("Rogue Client - Launch Failed");
                 });

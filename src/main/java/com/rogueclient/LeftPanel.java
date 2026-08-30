@@ -9,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -16,6 +17,8 @@ import javafx.stage.Stage;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LeftPanel extends VBox {
 
@@ -23,12 +26,18 @@ public class LeftPanel extends VBox {
     private final SettingsManager settingsManager;
     private VBox accountWidget = new VBox(4);
 
+    private StackPane avatarBox;
+    private Label nameLabel;
+
+    /** Non-logo icon tiles whose idle style needs to be re-applied when the theme changes (the logo tile keeps a fixed brand accent regardless of theme). */
+    private final List<VBox> themedIconBoxes = new ArrayList<>();
+
     public LeftPanel(AccountManager accountManager, SettingsManager settingsManager) {
         this.accountManager  = accountManager;
         this.settingsManager = settingsManager;
 
         setPrefWidth(68);
-        setStyle(panelStyle());
+        applyPanelStyle();
         setAlignment(Pos.TOP_CENTER);
         setPadding(new Insets(14, 0, 14, 0));
         setSpacing(6);
@@ -51,16 +60,28 @@ public class LeftPanel extends VBox {
         VBox website = createIcon("icons/globe.png", "Website", false, "https://rogueclient.rogueclient.abrdns.com/#home", false, false);
         getChildren().addAll(logo, account, settings, logsBtn, launcherFolder, spacer, accountWidget, discord, website);
 
+        ThemeManager.addListener(() -> Platform.runLater(this::applyTheme));
     }
 
-    private String panelStyle() {
-        String bg = ThemeManager.getInstance().leftPanelColor;
-        return "-fx-background-color: " + bg + "; -fx-border-color: #1a1a1a; -fx-border-width: 0 1 0 0; -fx-background-radius: 0 0 0 12; -fx-border-radius: 0 0 0 12;";
+    private void applyPanelStyle() {
+        setStyle(
+            "-fx-background-color: " + ThemedStyles.panelBg() + "; -fx-border-color: " + ThemedStyles.border() + "; " +
+            "-fx-border-width: 0 1 0 0; -fx-background-radius: 0 0 0 12; -fx-border-radius: 0 0 0 12;"
+        );
     }
 
-    /** Re-applies the current theme's colors to this panel without rebuilding it. */
-    public void refreshTheme() {
-        setStyle(panelStyle());
+    /** Re-applies every themed style already on screen, without rebuilding widgets or re-fetching the avatar image. */
+    private void applyTheme() {
+        applyPanelStyle();
+        for (VBox box : themedIconBoxes) {
+            box.setStyle(iconIdleStyle());
+        }
+        if (avatarBox != null) {
+            avatarBox.setStyle(iconIdleStyle());
+        }
+        if (nameLabel != null) {
+            nameLabel.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 9; -fx-font-family: '" + ThemedStyles.font() + "';");
+        }
     }
 
     public void refreshAccountWidget() {
@@ -68,12 +89,12 @@ public class LeftPanel extends VBox {
         AccountManager.Account acc = accountManager.getSelected();
         if (acc == null) return;
 
-        javafx.scene.layout.StackPane avatarBox = new javafx.scene.layout.StackPane();
+        avatarBox = new StackPane();
         avatarBox.setPrefSize(34, 34);
         avatarBox.setMaxSize(34, 34);
-        avatarBox.setStyle("-fx-background-color: #161616; -fx-background-radius: 8; -fx-cursor: hand;");
-        avatarBox.setOnMouseEntered(e -> avatarBox.setStyle("-fx-background-color: #222222; -fx-background-radius: 8; -fx-cursor: hand;"));
-        avatarBox.setOnMouseExited(e -> avatarBox.setStyle("-fx-background-color: #161616; -fx-background-radius: 8; -fx-cursor: hand;"));
+        avatarBox.setStyle(iconIdleStyle());
+        avatarBox.setOnMouseEntered(e -> avatarBox.setStyle(iconHoverStyle()));
+        avatarBox.setOnMouseExited(e -> avatarBox.setStyle(iconIdleStyle()));
         avatarBox.setOnMouseClicked(e -> openSkinPanel());
         Tooltip.install(avatarBox, new Tooltip("Skin & Cape"));
 
@@ -106,15 +127,26 @@ public class LeftPanel extends VBox {
             avatarBox.getChildren().add(fallbackAvatarLabel());
         }
 
-        Label nameLabel = new Label(acc.username);
-        nameLabel.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 9; -fx-font-family: 'JetBrains Mono';");
+        nameLabel = new Label(acc.username);
+        nameLabel.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 9; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         Platform.runLater(() -> accountWidget.getChildren().addAll(avatarBox, nameLabel));
     }
+
     private Label fallbackAvatarLabel() {
         Label fallback = new Label("?");
-        fallback.setStyle("-fx-text-fill: #555555; -fx-font-size: 14; -fx-font-family: 'JetBrains Mono';");
+        fallback.setStyle("-fx-text-fill: #555555; -fx-font-size: 14; -fx-font-family: '" + ThemedStyles.font() + "';");
         return fallback;
+    }
+
+    /** Idle background for non-logo icon tiles (and the avatar tile), reusing the Button Hover color - the two happen to share the same default shade (#161616). */
+    private String iconIdleStyle() {
+        return "-fx-background-color: " + ThemedStyles.btnHoverBg() + "; -fx-background-radius: 8; -fx-cursor: hand;";
+    }
+
+    /** Hover background for non-logo icon tiles, reusing the Button Pressed/Active color. */
+    private String iconHoverStyle() {
+        return "-fx-background-color: " + ThemedStyles.btnPressedBg() + "; -fx-background-radius: 8; -fx-cursor: hand;";
     }
 
     private VBox createIcon(String resourcePath, String tooltip, boolean isLogo, String url, boolean isAuth, boolean isSettings) {
@@ -123,16 +155,19 @@ public class LeftPanel extends VBox {
         box.setPrefSize(42, 42);
         box.setMaxSize(42, 42);
 
+        // The logo tile is a fixed brand accent and intentionally isn't themed, so the
+        // Rogue Client mark stays recognizable no matter what the rest of the launcher looks like.
         String baseStyle = isLogo
             ? "-fx-background-color: #1a1a1a; -fx-background-radius: 8; -fx-border-color: #2a2a2a; -fx-border-radius: 8; -fx-border-width: 0.5;"
-            : "-fx-background-color: #161616; -fx-background-radius: 8;";
+            : iconIdleStyle();
         box.setStyle(baseStyle);
+        if (!isLogo) themedIconBoxes.add(box);
 
         try {
             Image img = new Image(getClass().getClassLoader().getResourceAsStream(resourcePath));
             ImageView iv = new ImageView(img);
-            iv.setFitWidth(isLogo ? 32 : 20);
-            iv.setFitHeight(isLogo ? 32 : 20);
+            iv.setFitWidth(isLogo ? 24 : 20);
+            iv.setFitHeight(isLogo ? 24 : 20);
             iv.setPreserveRatio(true);
             box.getChildren().add(iv);
         } catch (Exception e) {
@@ -142,8 +177,8 @@ public class LeftPanel extends VBox {
         Tooltip.install(box, new Tooltip(tooltip));
 
         if (isLogo == false) {
-            box.setOnMouseEntered(e -> box.setStyle("-fx-background-color: #222222; -fx-background-radius: 8;"));
-            box.setOnMouseExited(e  -> box.setStyle("-fx-background-color: #161616; -fx-background-radius: 8;"));
+            box.setOnMouseEntered(e -> box.setStyle(iconHoverStyle()));
+            box.setOnMouseExited(e  -> box.setStyle(iconIdleStyle()));
 
             if (isAuth) {
                 box.setOnMouseClicked(e -> openAuthPanel());
@@ -162,7 +197,7 @@ public class LeftPanel extends VBox {
         popup.initModality(Modality.APPLICATION_MODAL);
 
         AuthPanel authPanel = new AuthPanel(accountManager);
-        authPanel.setStyle("-fx-background-color: #0f0f0f;");
+        authPanel.setStyle("-fx-background-color: " + ThemedStyles.panelBg() + ";");
 
         RogueWindowChrome.apply(popup, "LOGIN", authPanel, 400, 500, this::refreshAccountWidget);
         popup.centerOnScreen();
@@ -178,9 +213,9 @@ public class LeftPanel extends VBox {
         popup.initModality(Modality.APPLICATION_MODAL);
 
         SettingsPanel settingsPanel = new SettingsPanel(settingsManager);
-        settingsPanel.setStyle("-fx-background-color: #0f0f0f;");
+        settingsPanel.setStyle("-fx-background-color: " + ThemedStyles.panelBg() + ";");
 
-        RogueWindowChrome.apply(popup, "SETTINGS", settingsPanel, 520, 580, null);
+        RogueWindowChrome.apply(popup, "SETTINGS", settingsPanel, 560, 620, null);
         popup.centerOnScreen();
         popup.showAndWait();
     }

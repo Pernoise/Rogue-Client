@@ -29,25 +29,25 @@ public class NewInstanceDialog {
         javafx.scene.layout.StackPane iconBox = new javafx.scene.layout.StackPane(iconPreview);
         iconBox.setPrefSize(56, 56);
         iconBox.setMaxSize(56, 56);
-        iconBox.setStyle("-fx-background-color: #0f0f0f; -fx-border-color: #1a1a1a; -fx-border-radius: 10; -fx-background-radius: 10; -fx-cursor: hand;");
+        iconBox.setStyle("-fx-background-color: " + ThemedStyles.btnBg() + "; -fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 10; -fx-background-radius: 10; -fx-cursor: hand;");
 
         HBox iconRow = new HBox(14, iconBox, iconHint());
         iconRow.setAlignment(Pos.CENTER_LEFT);
 
         Label nameLabel = new Label("NAME");
-        nameLabel.setStyle("-fx-text-fill: #888888; -fx-font-size: 10; -fx-font-family: 'JetBrains Mono';");
+        nameLabel.setStyle("-fx-text-fill: #888888; -fx-font-size: 10; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         TextField nameField = new TextField(loaderLabel(loader) + " " + mcVersion);
         nameField.setStyle(
-            "-fx-background-color: #0f0f0f; -fx-text-fill: #ffffff; -fx-font-family: 'JetBrains Mono'; " +
-            "-fx-font-size: 13; -fx-border-color: #1a1a1a; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 12;"
+            "-fx-background-color: " + ThemedStyles.btnBg() + "; -fx-text-fill: " + ThemedStyles.text() + "; -fx-font-family: '" + ThemedStyles.font() + "'; " +
+            "-fx-font-size: 13; -fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 12;"
         );
 
         Label loaderLabel = new Label("LOADER");
-        loaderLabel.setStyle("-fx-text-fill: #888888; -fx-font-size: 10; -fx-font-family: 'JetBrains Mono';");
+        loaderLabel.setStyle("-fx-text-fill: #888888; -fx-font-size: 10; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         Label loaderValue = new Label(loaderLabel(loader) + "  \u00b7  " + mcVersion);
-        loaderValue.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 13; -fx-font-family: 'JetBrains Mono';");
+        loaderValue.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 13; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         iconBox.setOnMouseClicked(e -> IconPickerWindow.open(instanceManager, chosen -> {
             selectedIcon[0] = chosen;
@@ -76,7 +76,7 @@ public class NewInstanceDialog {
 
         VBox content = new VBox(16, iconRow, labeled(nameLabel, nameField), labeled(loaderLabel, loaderValue), btnRow);
         content.setPadding(new Insets(20));
-        content.setStyle("-fx-background-color: #080404;");
+        content.setStyle("-fx-background-color: " + ThemedStyles.mainBg() + ";");
 
         RogueWindowChrome.apply(stage, "NEW INSTANCE", content, 360, 320, null);
         stage.centerOnScreen();
@@ -90,7 +90,7 @@ public class NewInstanceDialog {
 
     private static Label iconHint() {
         Label hint = new Label("Click to change\ninstance icon");
-        hint.setStyle("-fx-text-fill: #888888; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        hint.setStyle("-fx-text-fill: #888888; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         return hint;
     }
 
@@ -104,8 +104,8 @@ public class NewInstanceDialog {
     }
 
     private static String dialogBtnStyle() {
-        return "-fx-background-color: #0f0f0f; -fx-text-fill: #ffffff; -fx-font-family: 'JetBrains Mono'; " +
-            "-fx-font-size: 12; -fx-border-color: #1a1a1a; -fx-border-radius: 6; -fx-background-radius: 6; " +
+        return "-fx-background-color: " + ThemedStyles.btnBg() + "; -fx-text-fill: " + ThemedStyles.text() + "; -fx-font-family: '" + ThemedStyles.font() + "'; " +
+            "-fx-font-size: 12; -fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 6; -fx-background-radius: 6; " +
             "-fx-cursor: hand; -fx-padding: 9 0;";
     }
 }

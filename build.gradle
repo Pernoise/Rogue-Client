@@ -56,6 +56,13 @@ task copyDeps(type: Copy) {
 
 build.dependsOn copyDeps
 
+// copyDeps and the application plugin's dist/start-script tasks both touch build/libs;
+// Gradle's task validation now requires an explicit ordering between tasks that share
+// an output location, even though there's no real data dependency here.
+tasks.named('distZip') { mustRunAfter tasks.named('copyDeps') }
+tasks.named('distTar') { mustRunAfter tasks.named('copyDeps') }
+tasks.named('startScripts') { mustRunAfter tasks.named('copyDeps') }
+
 task fatJar(type: Jar) {
     manifest {
         attributes(

@@ -47,8 +47,8 @@ public class IconPickerWindow {
         javafx.scene.control.Button browseBtn = new javafx.scene.control.Button("Browse for image...");
         browseBtn.setMaxWidth(Double.MAX_VALUE);
         browseBtn.setStyle(
-            "-fx-background-color: #0f0f0f; -fx-text-fill: #ffffff; -fx-font-family: 'JetBrains Mono'; " +
-            "-fx-font-size: 12; -fx-border-color: #1a1a1a; -fx-border-radius: 6; -fx-background-radius: 6; " +
+            "-fx-background-color: " + ThemedStyles.btnBg() + "; -fx-text-fill: " + ThemedStyles.text() + "; -fx-font-family: '" + ThemedStyles.font() + "'; " +
+            "-fx-font-size: 12; -fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 6; -fx-background-radius: 6; " +
             "-fx-cursor: hand; -fx-padding: 9 0;"
         );
         browseBtn.setOnAction(e -> {
@@ -71,7 +71,7 @@ public class IconPickerWindow {
 
         VBox root = new VBox(14, grid, browseBtn);
         root.setPadding(new Insets(20));
-        root.setStyle("-fx-background-color: #080404;");
+        root.setStyle("-fx-background-color: " + ThemedStyles.mainBg() + ";");
 
         RogueWindowChrome.apply(stage, "CHOOSE ICON", root, 340, 380, null);
         stage.centerOnScreen();
@@ -101,9 +101,9 @@ public class IconPickerWindow {
         StackPane box = new StackPane(iv);
         box.setPrefSize(48, 48);
         box.setMaxSize(48, 48);
-        box.setStyle("-fx-background-color: #0f0f0f; -fx-border-color: #1a1a1a; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;");
-        box.setOnMouseEntered(e -> box.setStyle("-fx-background-color: #161616; -fx-border-color: #1a1a1a; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"));
-        box.setOnMouseExited(e -> box.setStyle("-fx-background-color: #0f0f0f; -fx-border-color: #1a1a1a; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"));
+        box.setStyle("-fx-background-color: " + ThemedStyles.btnBg() + "; -fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;");
+        box.setOnMouseEntered(e -> box.setStyle("-fx-background-color: #161616; -fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"));
+        box.setOnMouseExited(e -> box.setStyle("-fx-background-color: " + ThemedStyles.btnBg() + "; -fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"));
         box.setOnMouseClicked(e -> onClick.run());
         return box;
     }

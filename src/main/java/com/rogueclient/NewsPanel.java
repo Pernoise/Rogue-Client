@@ -1,5 +1,6 @@
 package com.rogueclient;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -8,18 +9,52 @@ import javafx.scene.layout.VBox;
 public class NewsPanel extends VBox {
 
     private Label titleLabel;
+    private VBox cards;
 
     public NewsPanel() {
         setPrefWidth(300);
-        setStyle(panelStyle());
+        applyPanelStyle();
         setPadding(new Insets(20, 20, 20, 20));
         setSpacing(10);
 
-        Label title = new Label("NEWS");
-        titleLabel = title;
-        title.setStyle(titleStyle());
+        titleLabel = new Label("NEWS");
+        applyTitleStyle();
 
-        VBox cards = new VBox(8);
+        cards = new VBox(8);
+        rebuildCards();
+
+        ScrollPane scroll = new ScrollPane(cards);
+        scroll.getStyleClass().add("rocket-scroll");
+        scroll.setFitToWidth(true);
+        scroll.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;");
+        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        VBox.setVgrow(scroll, javafx.scene.layout.Priority.ALWAYS);
+
+        getChildren().addAll(titleLabel, scroll);
+
+        ThemeManager.addListener(() -> Platform.runLater(this::applyTheme));
+    }
+
+    private void applyPanelStyle() {
+        setStyle(
+            "-fx-background-color: " + ThemedStyles.newsBg() + "; " +
+            "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-width: 0 0 0 1;"
+        );
+    }
+
+    private void applyTitleStyle() {
+        titleLabel.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 9; -fx-font-family: '" + ThemedStyles.font() + "';");
+    }
+
+    private void applyTheme() {
+        applyPanelStyle();
+        applyTitleStyle();
+        rebuildCards();
+    }
+
+    private void rebuildCards() {
+        cards.getChildren().clear();
         cards.getChildren().addAll(
             newsCard("17/08/2026", "Rogue Client is officially out of beta — v1.0 released."),
             newsCard("17/08/2026", "Full version support added: every Minecraft version from 1.21.3 through 26.2 is now playable."),
@@ -59,42 +94,19 @@ public class NewsPanel extends VBox {
             newsCard("17/05/2026", "Version selector 1.19 to 26.1.2."),
             newsCard("17/05/2026", "Java path override in settings.")
         );
-
-        ScrollPane scroll = new ScrollPane(cards);
-        scroll.getStyleClass().add("rogue-scroll");
-        scroll.setFitToWidth(true);
-        scroll.setStyle("-fx-background: transparent; -fx-background-color: transparent; -fx-border-color: transparent;");
-        scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        VBox.setVgrow(scroll, javafx.scene.layout.Priority.ALWAYS);
-
-        getChildren().addAll(title, scroll);
-    }
-
-    private String panelStyle() {
-        String bg = ThemeManager.getInstance().newsPanelColor;
-        return "-fx-background-color: " + bg + "; -fx-border-color: #161616; -fx-border-width: 0 0 0 1;";
-    }
-
-    private String titleStyle() {
-        return "-fx-text-fill: " + ThemeManager.getInstance().textColor + "; -fx-font-size: 9; -fx-font-family: '" + ThemeManager.getInstance().textFontFamilyOrDefault() + "';";
-    }
-
-    /** Re-applies the current theme's colors to this panel without rebuilding it. */
-    public void refreshTheme() {
-        setStyle(panelStyle());
-        if (titleLabel != null) titleLabel.setStyle(titleStyle());
     }
 
     private VBox newsCard(String date, String text) {
         VBox card = new VBox(4);
-        card.setStyle("-fx-border-color: #161616; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 10;");
+        card.setStyle(
+            "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 10;"
+        );
 
         Label dateLabel = new Label(date);
-        dateLabel.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 10; -fx-font-family: 'JetBrains Mono';");
+        dateLabel.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 10; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         Label textLabel = new Label(text);
-        textLabel.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        textLabel.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         textLabel.setWrapText(true);
 
         card.getChildren().addAll(dateLabel, textLabel);

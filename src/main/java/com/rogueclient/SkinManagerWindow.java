@@ -34,10 +34,10 @@ public class SkinManagerWindow {
 
         VBox root = new VBox(16);
         root.setPadding(new Insets(20));
-        root.setStyle("-fx-background-color: #0f0f0f;");
+        root.setStyle("-fx-background-color: " + ThemedStyles.panelBg() + ";");
 
         Label title = new Label("Skin & Cape");
-        title.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 16; -fx-font-family: 'JetBrains Mono'; -fx-font-weight: bold;");
+        title.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 16; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-weight: bold;");
 
         if (acc == null) {
             root.getChildren().addAll(title, infoLabel("No account selected. Log in from the Account window first."));
@@ -76,17 +76,17 @@ public class SkinManagerWindow {
         bodyRender.setSmooth(false); // upscaled pixel art stays crisp instead of blurring
 
         Label modelLabel = new Label("");
-        modelLabel.setStyle("-fx-text-fill: #888888; -fx-font-size: 10; -fx-font-family: 'JetBrains Mono';");
+        modelLabel.setStyle("-fx-text-fill: #888888; -fx-font-size: 10; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         VBox previewBox = new VBox(6, bodyRender, modelLabel);
         previewBox.setAlignment(Pos.TOP_CENTER);
         previewBox.setPadding(new Insets(12));
         previewBox.setPrefWidth(220);
-        previewBox.setStyle("-fx-background-color: #141414; -fx-background-radius: 8; -fx-border-color: #1a1a1a; -fx-border-radius: 8; -fx-border-width: 1;");
+        previewBox.setStyle("-fx-background-color: #141414; -fx-background-radius: 8; -fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 8; -fx-border-width: 1;");
 
         Label status = new Label("Loading your skins and capes...");
         status.setWrapText(true);
-        status.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        status.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         Label skinsHeader = sectionHeader("Skins");
         VBox skinsList = new VBox(6);
@@ -97,7 +97,7 @@ public class SkinManagerWindow {
         VBox listsColumn = new VBox(12, skinsHeader, skinsList, capesHeader, capesList);
 
         ScrollPane scroll = new ScrollPane(listsColumn);
-        scroll.getStyleClass().add("rogue-scroll");
+        scroll.getStyleClass().add("rocket-scroll");
         scroll.setFitToWidth(true);
         scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent;");
         scroll.setPrefHeight(320);
@@ -161,7 +161,7 @@ public class SkinManagerWindow {
                     Platform.runLater(() -> {
                         uploadBtn.setDisable(false);
                         uploadBtn.setText("Upload New Skin");
-                        status.setStyle("-fx-text-fill: #f44336; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+                        status.setStyle("-fx-text-fill: #f44336; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
                         status.setText("Upload failed: " + ex.getMessage());
                     });
                 }
@@ -181,7 +181,7 @@ public class SkinManagerWindow {
             try {
                 MinecraftServicesClient.Profile profile = MinecraftServicesClient.fetchProfile(acc.accessToken);
                 Platform.runLater(() -> {
-                    status.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+                    status.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
                     status.setText(profile.skins.size() + " skin(s), " + profile.capes.size() + " cape(s) on this account.");
 
                     MinecraftServicesClient.SkinEntry activeSkin = profile.skins.stream()
@@ -214,7 +214,7 @@ public class SkinManagerWindow {
                 });
             } catch (Exception ex) {
                 Platform.runLater(() -> {
-                    status.setStyle("-fx-text-fill: #f44336; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+                    status.setStyle("-fx-text-fill: #f44336; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
                     status.setText("Could not load profile: " + ex.getMessage());
                 });
             }
@@ -369,64 +369,64 @@ public class SkinManagerWindow {
 
     private static Label emptyRow(String text) {
         Label label = new Label(text);
-        label.setStyle("-fx-text-fill: #555555; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        label.setStyle("-fx-text-fill: #555555; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         return label;
     }
 
     private static Label sectionHeader(String text) {
         Label label = new Label(text);
-        label.setStyle("-fx-text-fill: #888888; -fx-font-size: 10; -fx-font-family: 'JetBrains Mono'; -fx-font-weight: bold;");
+        label.setStyle("-fx-text-fill: #888888; -fx-font-size: 10; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-weight: bold;");
         return label;
     }
 
     private static Label infoLabel(String text) {
         Label label = new Label(text);
         label.setWrapText(true);
-        label.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';");
+        label.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         return label;
     }
 
     private static String rowLabelStyle(boolean active) {
-        return "-fx-text-fill: " + (active ? "#4caf50" : "#ffffff") + "; -fx-font-size: 11; -fx-font-family: 'JetBrains Mono';";
+        return "-fx-text-fill: " + (active ? "#4caf50" : "#ffffff") + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';";
     }
 
     private static String selectBtnStyle() {
-        return "-fx-background-color: #1a1a1a; -fx-text-fill: #ffffff; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 10; -fx-cursor: hand; -fx-padding: 4 10; -fx-border-color: #2a2a2a; -fx-border-radius: 4; -fx-background-radius: 4;";
+        return "-fx-background-color: #1a1a1a; -fx-text-fill: " + ThemedStyles.text() + "; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 10; -fx-cursor: hand; -fx-padding: 4 10; -fx-border-color: #2a2a2a; -fx-border-radius: 4; -fx-background-radius: 4;";
     }
 
     private static String selectBtnHoverStyle() {
-        return "-fx-background-color: #262626; -fx-text-fill: #ffffff; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 10; -fx-cursor: hand; -fx-padding: 4 10; -fx-border-color: #3a3a3a; -fx-border-radius: 4; -fx-background-radius: 4;";
+        return "-fx-background-color: #262626; -fx-text-fill: " + ThemedStyles.text() + "; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 10; -fx-cursor: hand; -fx-padding: 4 10; -fx-border-color: #3a3a3a; -fx-border-radius: 4; -fx-background-radius: 4;";
     }
 
     private static String equippedBtnStyle() {
-        return "-fx-background-color: #101a10; -fx-text-fill: #4caf50; -fx-font-family: 'JetBrains Mono'; -fx-font-size: 10; -fx-padding: 4 10; -fx-border-color: #1a2a1a; -fx-border-radius: 4; -fx-background-radius: 4;";
+        return "-fx-background-color: #101a10; -fx-text-fill: #4caf50; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 10; -fx-padding: 4 10; -fx-border-color: #1a2a1a; -fx-border-radius: 4; -fx-background-radius: 4;";
     }
 
     private static String primaryBtnStyle() {
-        return "-fx-background-color: #0f0f0f; -fx-text-fill: #ffffff; " +
-            "-fx-font-size: 12; -fx-font-weight: bold; -fx-font-family: 'JetBrains Mono'; " +
-            "-fx-border-color: #1a1a1a; -fx-border-width: 1; " +
+        return "-fx-background-color: " + ThemedStyles.btnBg() + "; -fx-text-fill: " + ThemedStyles.text() + "; " +
+            "-fx-font-size: 12; -fx-font-weight: bold; -fx-font-family: '" + ThemedStyles.font() + "'; " +
+            "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-width: 1; " +
             "-fx-background-radius: 8; -fx-border-radius: 8; " +
             "-fx-cursor: hand; -fx-padding: 10 20; -fx-opacity: 0.88;";
     }
 
     private static String primaryBtnHoverStyle() {
-        return "-fx-background-color: #1c1c1c; -fx-text-fill: #ffffff; " +
-            "-fx-font-size: 12; -fx-font-weight: bold; -fx-font-family: 'JetBrains Mono'; " +
+        return "-fx-background-color: #1c1c1c; -fx-text-fill: " + ThemedStyles.text() + "; " +
+            "-fx-font-size: 12; -fx-font-weight: bold; -fx-font-family: '" + ThemedStyles.font() + "'; " +
             "-fx-border-color: #2a2a2a; -fx-border-width: 1; " +
             "-fx-background-radius: 8; -fx-border-radius: 8; " +
             "-fx-cursor: hand; -fx-padding: 10 20; -fx-opacity: 1;";
     }
 
     private static String toggleStyle(boolean selected) {
-        return "-fx-background-color: " + (selected ? "#1a1a1a" : "#0f0f0f") + "; -fx-text-fill: #ffffff; " +
-            "-fx-font-family: 'JetBrains Mono'; -fx-font-size: 10; -fx-cursor: hand; -fx-padding: 10 12; " +
+        return "-fx-background-color: " + (selected ? ThemedStyles.btnHoverBg() : ThemedStyles.btnBg()) + "; -fx-text-fill: " + ThemedStyles.text() + "; " +
+            "-fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 10; -fx-cursor: hand; -fx-padding: 10 12; " +
             "-fx-border-color: #2a2a2a; -fx-border-radius: 6; -fx-background-radius: 6;";
     }
 
     private static String toggleHoverStyle(boolean selected) {
-        return "-fx-background-color: " + (selected ? "#242424" : "#1a1a1a") + "; -fx-text-fill: #ffffff; " +
-            "-fx-font-family: 'JetBrains Mono'; -fx-font-size: 10; -fx-cursor: hand; -fx-padding: 10 12; " +
+        return "-fx-background-color: " + (selected ? "#242424" : "#1a1a1a") + "; -fx-text-fill: " + ThemedStyles.text() + "; " +
+            "-fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 10; -fx-cursor: hand; -fx-padding: 10 12; " +
             "-fx-border-color: #3a3a3a; -fx-border-radius: 6; -fx-background-radius: 6;";
     }
 }

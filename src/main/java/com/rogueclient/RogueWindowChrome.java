@@ -17,6 +17,13 @@ import javafx.stage.StageStyle;
  * Builds the same rounded, draggable, minimizable window chrome that Main.java
  * uses for the primary window, so popups (log, settings, login) look and behave
  * consistently instead of falling back to plain square UNDECORATED stages.
+ *
+ * The title bar, wrapper background/border and title-bar buttons all read live
+ * from ThemeManager, so every popup in the launcher (they all route through
+ * apply()) automatically follows the user's Main Background / Border / Text
+ * customization without each popup file needing its own theming for the chrome.
+ * Each popup's own *content* background is left as that file sets it - some
+ * intentionally use the Left Panel color, others the Main Background color.
  */
 public class RogueWindowChrome {
 
@@ -26,21 +33,24 @@ public class RogueWindowChrome {
      */
     public static void apply(Stage stage, String title, Region content, double width, double height, Runnable onClose) {
         stage.initStyle(StageStyle.TRANSPARENT);
-        ThemeManager theme = ThemeManager.getInstance();
 
         Label titleLabel = new Label(title);
-        titleLabel.setStyle("-fx-text-fill: " + theme.textColor + "; -fx-font-size: 11; -fx-font-family: '" + theme.textFontFamilyOrDefault() + "';");
+        titleLabel.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
 
         Button minimizeBtn = new Button("-");
-        minimizeBtn.setStyle(titleBtnStyle(theme));
-        minimizeBtn.setOnMouseEntered(e -> minimizeBtn.setStyle(titleBtnHoverStyle(theme)));
-        minimizeBtn.setOnMouseExited(e -> minimizeBtn.setStyle(titleBtnStyle(theme)));
+        minimizeBtn.setStyle(titleBtnStyle());
+        minimizeBtn.setOnMouseEntered(e -> minimizeBtn.setStyle(titleBtnHoverStyle()));
+        minimizeBtn.setOnMouseExited(e -> minimizeBtn.setStyle(titleBtnStyle()));
         minimizeBtn.setOnAction(e -> stage.setIconified(true));
 
         Button closeBtn = new Button("x");
-        closeBtn.setStyle(titleBtnStyle(theme));
-        closeBtn.setOnMouseEntered(e -> closeBtn.setStyle(closeBtnHoverStyle(theme)));
-        closeBtn.setOnMouseExited(e -> closeBtn.setStyle(titleBtnStyle(theme)));
+        closeBtn.setStyle(titleBtnStyle());
+        closeBtn.setOnMouseEntered(e -> closeBtn.setStyle(closeBtnHoverStyle()));
+        closeBtn.setOnMouseExited(e -> closeBtn.setStyle(titleBtnStyle()));
+        closeBtn.setOnAction(e -> {
+            stage.close();
+            if (onClose != null) onClose.run();
+        });
 
         HBox spacer = new HBox();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -49,7 +59,7 @@ public class RogueWindowChrome {
         titleBar.setMaxWidth(Double.MAX_VALUE);
         titleBar.setAlignment(Pos.CENTER_LEFT);
         titleBar.setPadding(new Insets(6, 8, 6, 12));
-        titleBar.setStyle("-fx-background-color: " + theme.titleBarColor + "; -fx-background-radius: 12 12 0 0;");
+        titleBar.setStyle("-fx-background-color: " + ThemedStyles.mainBg() + "; -fx-background-radius: 12 12 0 0;");
 
         double[] offset = new double[2];
         titleBar.setOnMousePressed(e -> { offset[0] = e.getSceneX(); offset[1] = e.getSceneY(); });
@@ -62,23 +72,10 @@ public class RogueWindowChrome {
 
         VBox wrapper = new VBox(0, titleBar, content);
         VBox.setVgrow(content, Priority.ALWAYS);
-        wrapper.setStyle("-fx-background-color: #080404; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #1a1a1a; -fx-border-width: 1;");
-
-        // Live-restyle this popup's title bar if the theme is saved while it's still open.
-        // Wrapper background is intentionally fixed - see the comment in Main.java.
-        Runnable themeListener = () -> {
-            ThemeManager t = ThemeManager.getInstance();
-            titleLabel.setStyle("-fx-text-fill: " + t.textColor + "; -fx-font-size: 11; -fx-font-family: '" + t.textFontFamilyOrDefault() + "';");
-            titleBar.setStyle("-fx-background-color: " + t.titleBarColor + "; -fx-background-radius: 12 12 0 0;");
-        };
-        theme.addListener(themeListener);
-
-        closeBtn.setOnAction(e -> {
-            theme.removeListener(themeListener);
-            stage.close();
-            if (onClose != null) onClose.run();
-        });
-        stage.setOnHidden(e -> theme.removeListener(themeListener));
+        wrapper.setStyle(
+            "-fx-background-color: " + ThemedStyles.mainBg() + "; -fx-background-radius: 12; " +
+            "-fx-border-radius: 12; -fx-border-color: " + ThemedStyles.border() + "; -fx-border-width: 1;"
+        );
 
         Scene scene = new Scene(wrapper, width, height);
         scene.setFill(Color.TRANSPARENT);
@@ -88,15 +85,15 @@ public class RogueWindowChrome {
         stage.setMinHeight(height);
     }
 
-    private static String titleBtnStyle(ThemeManager theme) {
-        return "-fx-background-color: transparent; -fx-text-fill: " + theme.textColor + "; -fx-font-family: '" + theme.textFontFamilyOrDefault() + "'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
+    private static String titleBtnStyle() {
+        return "-fx-background-color: transparent; -fx-text-fill: " + ThemedStyles.text() + "; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
     }
 
-    private static String titleBtnHoverStyle(ThemeManager theme) {
-        return "-fx-background-color: " + theme.buttonHoverColor + "; -fx-text-fill: " + theme.textColor + "; -fx-font-family: '" + theme.textFontFamilyOrDefault() + "'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
+    private static String titleBtnHoverStyle() {
+        return "-fx-background-color: " + ThemedStyles.btnHoverBg() + "; -fx-text-fill: " + ThemedStyles.text() + "; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
     }
 
-    private static String closeBtnHoverStyle(ThemeManager theme) {
-        return "-fx-background-color: #3a0000; -fx-text-fill: #ff4444; -fx-font-family: '" + theme.textFontFamilyOrDefault() + "'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
+    private static String closeBtnHoverStyle() {
+        return "-fx-background-color: #3a0000; -fx-text-fill: #ff4444; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 12; -fx-cursor: hand; -fx-padding: 2 10; -fx-border-color: transparent;";
     }
 }
