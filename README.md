@@ -29,19 +29,55 @@ Built entirely with **Java** and **JavaFX**, Rogue Client is designed to provide
 
 ## Launcher
 
-![Launcher](src/main/resources/images/Launcher.png)
+![Launcher](src/main/resources/images/launcher-layout.png)
 
 ---
 
 ## Account Manager
 
-![Account Manager](src/main/resources/images/Account.png)
+![Account Manager](src/main/resources/images/account.png)
 
 ---
 
 ## Splash Screen
 
-![Splash Screen](src/main/resources/images/Splashscreen.png)
+![Splash Screen](src/main/resources/images/splashscreen.png)
+
+---
+
+## About & Credits
+
+![About & Credits](src/main/resources/images/about-and-credits.png)
+
+---
+
+## Customization Settings
+
+![Customization Settings](src/main/resources/images/customization-settings.png)
+
+---
+
+## Dev Tools
+
+![Dev Tools](src/main/resources/images/devtools.png)
+
+---
+
+## Launch Settings
+
+![Launch Settings](src/main/resources/images/launch-settings.png)
+
+---
+
+## Login
+
+![Login](src/main/resources/images/login.png)
+
+---
+
+## Skin Manager
+
+![Skin Manager](src/main/resources/images/skin-manager.png)
 
 ---
 
