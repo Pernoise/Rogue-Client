@@ -43,7 +43,7 @@ public class FirstLaunchDialog {
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(40, 48, 32, 48));
         root.setStyle(
-            "-fx-background-color: " + ThemedStyles.mainBg() + ";" +
+            "-fx-background-color: " + ThemedStyles.fixedBaseBg() + ";" +
             "-fx-background-radius: 12;" +
             "-fx-border-color: " + ThemedStyles.border() + ";" +
             "-fx-border-width: 1;" +

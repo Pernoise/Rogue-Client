@@ -11,3 +11,6 @@ local/
 fabricloader.log
 *.log.gz
 Appimagetools/*.AppImage
+*.AppImage
+*.AppImage
+build/

@@ -102,7 +102,7 @@ public class Main extends Application {
             });
 
             BorderPane root = new BorderPane();
-            root.setStyle("-fx-background-color: " + ThemedStyles.mainBg() + "; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-background-radius: 0 0 12 12;");
+            root.setStyle("-fx-background-color: " + ThemedStyles.fixedBaseBg() + "; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-background-radius: 0 0 12 12;");
             root.setLeft(new LeftPanel(accountManager, settingsManager));
             root.setCenter(new CenterPanel(accountManager, settingsManager));
             root.setRight(new NewsPanel());
@@ -110,7 +110,7 @@ public class Main extends Application {
             VBox wrapper = new VBox(0, titleBar, root);
             VBox.setVgrow(root, Priority.ALWAYS);
             wrapper.setStyle(
-                "-fx-background-color: " + ThemedStyles.mainBg() + "; -fx-background-radius: 12; -fx-border-radius: 12; " +
+                "-fx-background-color: " + ThemedStyles.fixedBaseBg() + "; -fx-background-radius: 12; -fx-border-radius: 12; " +
                 "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-width: 1;"
             );
 
@@ -119,9 +119,9 @@ public class Main extends Application {
             ThemeManager.addListener(() -> Platform.runLater(() -> {
                 titleLabel.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
                 titleBar.setStyle("-fx-background-color: " + ThemedStyles.mainBg() + "; -fx-background-radius: 12 12 0 0;");
-                root.setStyle("-fx-background-color: " + ThemedStyles.mainBg() + "; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-background-radius: 0 0 12 12;");
+                root.setStyle("-fx-background-color: " + ThemedStyles.fixedBaseBg() + "; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-background-radius: 0 0 12 12;");
                 wrapper.setStyle(
-                    "-fx-background-color: " + ThemedStyles.mainBg() + "; -fx-background-radius: 12; -fx-border-radius: 12; " +
+                    "-fx-background-color: " + ThemedStyles.fixedBaseBg() + "; -fx-background-radius: 12; -fx-border-radius: 12; " +
                     "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-width: 1;"
                 );
                 minimizeBtn.setStyle(titleBtnStyle());

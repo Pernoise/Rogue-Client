@@ -377,7 +377,7 @@ public class SettingsPanel extends VBox {
         panel.getChildren().addAll(checkUpdateBtn, updateStatus);
 
         panel.getChildren().add(sectionLabel("Credits"));
-        Label credits = new Label("Built by Pernoise");
+        Label credits = new Label("By Syndicate Software");
         credits.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         panel.getChildren().add(credits);
 
@@ -389,6 +389,18 @@ public class SettingsPanel extends VBox {
         creditSuffix.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
         avatarCreditRow.getChildren().addAll(creditPrefix, linkLabel("Crafatar", "https://crafatar.com"), creditSuffix);
         panel.getChildren().add(avatarCreditRow);
+
+        HBox legalRow = new HBox(8);
+        legalRow.setAlignment(Pos.CENTER_LEFT);
+        legalRow.setPadding(new Insets(4, 0, 0, 0));
+        Button termsBtn = new Button("Terms");
+        termsBtn.setStyle(secondaryBtnStyle());
+        termsBtn.setOnAction(e -> BrowserUtil.open("https://rogue.pernoise.workers.dev/terms"));
+        Button privacyBtn = new Button("Privacy");
+        privacyBtn.setStyle(secondaryBtnStyle());
+        privacyBtn.setOnAction(e -> BrowserUtil.open("https://rogue.pernoise.workers.dev/privacy"));
+        legalRow.getChildren().addAll(termsBtn, privacyBtn);
+        panel.getChildren().add(legalRow);
 
         return panel;
     }

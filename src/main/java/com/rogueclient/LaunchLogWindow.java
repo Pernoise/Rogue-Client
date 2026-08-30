@@ -23,7 +23,7 @@ public class LaunchLogWindow {
         stage = new Stage();
 
         VBox root = new VBox(12);
-        root.setStyle("-fx-background-color: " + ThemedStyles.mainBg() + ";");
+        root.setStyle("-fx-background-color: " + ThemedStyles.centerBg() + ";");
         root.setPadding(new Insets(20));
 
         tipsBox = new VBox(6);
@@ -31,10 +31,10 @@ public class LaunchLogWindow {
         logArea = new TextArea();
         logArea.getStyleClass().add("rocket-scroll");
         logArea.setStyle(
-            "-fx-background-color: " + ThemedStyles.mainBg() + "; -fx-text-fill: " + ThemedStyles.text() + "; " +
+            "-fx-background-color: " + ThemedStyles.centerBg() + "; -fx-text-fill: " + ThemedStyles.text() + "; " +
             "-fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-size: 11; " +
             "-fx-border-color: " + ThemedStyles.border() + "; -fx-border-radius: 6; -fx-background-radius: 6; " +
-            "-fx-control-inner-background: " + ThemedStyles.mainBg() + ";"
+            "-fx-control-inner-background: " + ThemedStyles.centerBg() + ";"
         );
         logArea.setEditable(false);
         logArea.setWrapText(true);

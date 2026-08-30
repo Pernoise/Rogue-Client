@@ -29,7 +29,16 @@ public class ThemeEditorWindow {
         Node build(ThemeManager draft, Runnable onChange);
     }
 
+    public interface PreviewBuilder {
+        /** Builds the live preview shown above the controls, re-invoked after every edit. */
+        Region build(ThemeManager draft);
+    }
+
     public static void open(String title, ControlsBuilder controlsBuilder) {
+        open(title, controlsBuilder, ThemeEditorWindow::buildPreview);
+    }
+
+    public static void open(String title, ControlsBuilder controlsBuilder, PreviewBuilder previewBuilder) {
         ThemeManager draft = ThemeManager.get().copy();
 
         Stage stage = new Stage();
@@ -40,7 +49,7 @@ public class ThemeEditorWindow {
         previewHolder.setAlignment(Pos.CENTER);
 
         Runnable[] refresh = new Runnable[1];
-        refresh[0] = () -> previewHolder.getChildren().setAll(buildPreview(draft));
+        refresh[0] = () -> previewHolder.getChildren().setAll(previewBuilder.build(draft));
         refresh[0].run();
 
         Label previewLabel = sectionLabel("Live Preview");
@@ -92,6 +101,32 @@ public class ThemeEditorWindow {
         RogueWindowChrome.apply(stage, title.toUpperCase(), root, 480, 620, null);
         stage.centerOnScreen();
         stage.showAndWait();
+    }
+
+    /** Mockup of the splash/loading screen shown on launch, for the Splash Screen editor. */
+    static Region buildSplashPreview(ThemeManager draft) {
+        String font = ThemedStyles.font();
+
+        Label title = new Label("Rogue Client");
+        title.setStyle("-fx-text-fill: " + draft.textColor + "; -fx-font-size: 16; -fx-font-family: '" + font + "'; -fx-font-weight: bold; -fx-opacity: 0.88;");
+
+        Label version = new Label("v1.0");
+        version.setStyle("-fx-text-fill: " + draft.textColor + "; -fx-font-size: 9; -fx-font-family: '" + font + "';");
+
+        Label status = new Label("Initializing...");
+        status.setStyle("-fx-text-fill: " + draft.textColor + "; -fx-font-size: 9; -fx-font-family: '" + font + "';");
+
+        VBox splash = new VBox(12, title, version, status);
+        splash.setAlignment(Pos.CENTER);
+        splash.setPadding(new Insets(40, 60, 24, 60));
+        splash.setPrefSize(340, 180);
+        splash.setMaxSize(340, 180);
+        splash.setStyle(
+            "-fx-background-color: " + draft.splashBackground + "; " +
+            "-fx-border-color: " + draft.panelBorderColor + "; -fx-border-width: 1; " +
+            "-fx-background-radius: 10; -fx-border-radius: 10;"
+        );
+        return splash;
     }
 
     private static Region spacer() {
@@ -166,14 +201,39 @@ public class ThemeEditorWindow {
             "-fx-border-color: " + draft.panelBorderColor + "; -fx-border-width: 0 0 0 1;"
         );
 
-        HBox launcher = new HBox(left, center, news);
-        launcher.setPrefSize(420, 210);
-        launcher.setMaxSize(420, 210);
-        launcher.setStyle(
-            "-fx-background-color: " + draft.mainBackground + "; " +
-            "-fx-border-color: " + draft.panelBorderColor + "; -fx-border-width: 1; " +
-            "-fx-background-radius: 8; -fx-border-radius: 8;"
+        HBox body = new HBox(left, center, news);
+        HBox.setHgrow(body, Priority.ALWAYS);
+        body.setStyle(
+            "-fx-background-color: " + ThemedStyles.fixedBaseBg() + "; " +
+            "-fx-border-color: " + draft.panelBorderColor + "; -fx-border-width: 0 1 1 1; " +
+            "-fx-background-radius: 0 0 8 8; -fx-border-radius: 0 0 8 8;"
         );
+
+        // Title bar mockup - this strip is the only thing "Main Background" actually controls now.
+        HBox titleBarDots = new HBox(4);
+        for (int i = 0; i < 2; i++) {
+            Region dot = new Region();
+            dot.setPrefSize(6, 6);
+            dot.setMaxSize(6, 6);
+            dot.setStyle("-fx-background-color: " + draft.textColor + "; -fx-background-radius: 3; -fx-opacity: 0.7;");
+            titleBarDots.getChildren().add(dot);
+        }
+        Label titleBarLabel = new Label("Rogue Client");
+        titleBarLabel.setStyle("-fx-text-fill: " + draft.textColor + "; -fx-font-size: 9; -fx-font-family: '" + font + "';");
+        Region titleBarSpacer = new Region();
+        HBox.setHgrow(titleBarSpacer, Priority.ALWAYS);
+        HBox titleBar = new HBox(6, titleBarLabel, titleBarSpacer, titleBarDots);
+        titleBar.setAlignment(Pos.CENTER_LEFT);
+        titleBar.setPadding(new Insets(6, 10, 6, 10));
+        titleBar.setStyle(
+            "-fx-background-color: " + draft.mainBackground + "; " +
+            "-fx-border-color: " + draft.panelBorderColor + "; -fx-border-width: 1 1 0 1; " +
+            "-fx-background-radius: 8 8 0 0; -fx-border-radius: 8 8 0 0;"
+        );
+
+        VBox launcher = new VBox(titleBar, body);
+        launcher.setPrefSize(420, 220);
+        launcher.setMaxSize(420, 220);
         return launcher;
     }
 

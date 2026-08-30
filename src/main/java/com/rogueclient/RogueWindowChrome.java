@@ -73,7 +73,7 @@ public class RogueWindowChrome {
         VBox wrapper = new VBox(0, titleBar, content);
         VBox.setVgrow(content, Priority.ALWAYS);
         wrapper.setStyle(
-            "-fx-background-color: " + ThemedStyles.mainBg() + "; -fx-background-radius: 12; " +
+            "-fx-background-color: " + ThemedStyles.fixedBaseBg() + "; -fx-background-radius: 12; " +
             "-fx-border-radius: 12; -fx-border-color: " + ThemedStyles.border() + "; -fx-border-width: 1;"
         );
 
