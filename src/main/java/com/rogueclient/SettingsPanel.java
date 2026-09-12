@@ -1,15 +1,13 @@
 package com.rogueclient;
 
-import javafx.animation.FadeTransition;
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
+import javafx.animation.*;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.text.*;
 import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
@@ -17,14 +15,13 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
-
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -34,6 +31,8 @@ public class SettingsPanel extends VBox {
     private final SettingsManager settings;
     private Label titleLabel;
     private HBox tabBar;
+
+    private final Image[] devToggleAnim_ = new Image[181];
 
     public SettingsPanel(SettingsManager settings) {
         this.settings = settings;
@@ -130,9 +129,19 @@ public class SettingsPanel extends VBox {
             devtoolsPanel.setManaged(true);
             setActive(devToolsTab, launchTab, discordTab, styleTab, aboutTab);
         });
-
-
+        if (!settings.devMode) {
+            devToolsTab.setManaged(false);
+            devToolsTab.setVisible(false);
+        }
+        //loads the devtoggle images
+        devToggleAnim_[0] = new Image(getClass().getResourceAsStream("/images/devScrewSprites/0000.png"));
+        devSpriteCollectionThread();
+        tabBar.setViewOrder(-1);
         getChildren().addAll(titleLabel, tabBar, content);
+        //adds the devMode toggle
+        if (!settings.devMode) {
+            getChildren().add(devToggle_(devToolsTab, devtoolsPanel, launchPanel, launchTab));
+        }
 
         ThemeManager.addListener(() -> javafx.application.Platform.runLater(() -> {
             applyPanelStyle();
@@ -141,13 +150,118 @@ public class SettingsPanel extends VBox {
         }));
     }
 
+    private ImageView devToggle_(Button devButton, VBox devPanel, VBox backupPanel, Button backupButton) {
+        ImageView r = new ImageView(devToggleAnim_[0]);
+        //sets the scale of the animation
+        r.setFitHeight((double) 500 / 5);
+        r.setFitWidth((double) 2000 / 5);
+        //sets the layout
+        r.setManaged(false);
+        r.setTranslateX(141);
+        r.setTranslateY(15);
+        //makes clicking easier
+        r.setPickOnBounds(true);
+        //sets the click animation up as a transition of sprites
+        Transition animation = new Transition() {
+
+            {
+                setCycleDuration(Duration.seconds(15.08));
+            }
+
+            int lastPausedIndex;
+
+            @Override
+            protected void interpolate(double frac) {
+                int index = (int) Math.round(frac * 180);
+                r.setImage(devToggleAnim_[index]);
+                //on entering a new stage, pause.
+                if (index == 38 || index == 53 || index == 85 || index == 111) {
+                    //makes sure that, on the next click after a pause, it doesn't immediately pause again.
+                    if (lastPausedIndex != index) {
+                        this.pause();
+                        lastPausedIndex = index;
+                    }
+                }
+                //toggles the devPanel on/off
+                if (index == 180) {
+                    //if devmode is enabled in settings, then hide it, and disable it in settings.
+                    if (settings.devMode) {
+                        devButton.setVisible(false);
+                        devButton.setManaged(false);
+                        settings.devMode = false;
+                        settings.save();
+                        //if the devpanel is visible, fallback to the backup panel. take one for the crew.
+                        if (devPanel.visibleProperty().get()) {
+                            backupPanel.setVisible(true);
+                            backupPanel.setManaged(true);
+                            backupButton.setVisible(true);
+                            backupButton.setManaged(true);
+                            devPanel.setVisible(false);
+                            devPanel.setManaged(false);
+                            setActive(backupButton, devButton);
+                        }
+
+                    } else {
+                        //if devmode is disabled in settings, then show its button, and enable it in settings.
+                        settings.devMode = true;
+                        settings.save();
+                        devButton.setTranslateY(15);
+                        devButton.setOpacity(0.0);
+                        devButton.setVisible(true);
+                        devButton.setManaged(true);
+                        //a cool smooth animation for the devtab's entrance.
+                        KeyFrame kf1 = new KeyFrame(Duration.ZERO, new KeyValue(devButton.translateYProperty(), 20), new KeyValue(devButton.opacityProperty(), 0.0));
+                        KeyFrame kf2 = new KeyFrame(Duration.seconds(2), new KeyValue(devButton.translateYProperty(), 0, Interpolator.SPLINE(0.0, 0.7, 0.1, 1.0)), new KeyValue(devButton.opacityProperty(), 1, Interpolator.SPLINE(0.0, 0.7, 0.1, 1.0)));
+                        Timeline toggleAppearance = new Timeline(kf1, kf2);
+                        toggleAppearance.play();
+                    }
+
+                }
+            }
+        };
+        //plays the animation on click
+        r.setOnMouseClicked(event -> {
+            if (!settings.devMode) {
+                animation.play();
+            }
+        });
+
+        //cool its the result wow
+        return r;
+    }
+
+    private void devSpriteCollectionThread() {
+        //devnote: invert the color of the animation if the style bg is white. 
+        //collects all the image sprites for the animation and turns them into an array
+        Thread loader = new Thread(() -> {
+            for (int i = 0; i < 180; i++) {
+
+                //a method to find the file number. (like 0001.png)
+                String exactFile = String.format("%04d", i);
+                //makes the path for each image
+                String path = "/images/devScrewSprites/" + exactFile + ".png";
+
+                java.net.URL resource = getClass().getResource(path);
+                if (resource != null) {
+                    devToggleAnim_[i] = new Image(resource.toExternalForm());
+                } else {
+                    System.err.println("devToggle sprite failed to load! path:  " + path + " the animation files in this build is likely missing or are in a new directory. Ignorant devs!");
+                }
+            }
+        });
+        loader.setDaemon(true);
+        loader.start();
+
+    }
+
+
     private void applyPanelStyle() {
         setStyle("-fx-background-color: " + ThemedStyles.panelBg() + ";");
     }
 
     private void applyTitleStyle() {
         titleLabel.setStyle(
-            "-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 14; -fx-font-family: '" + ThemedStyles.font() + "'; " +
+                "-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 25; -fx-font-family: '" + ThemedStyles.font() + "'; " +
             "-fx-font-weight: bold; -fx-opacity: 0.88;"
         );
     }
@@ -450,6 +564,7 @@ public class SettingsPanel extends VBox {
         nukeRow.setAlignment(Pos.CENTER_LEFT);
 
         Button clearLocalDataBtn = new Button(NUKE_IDLE_TEXT);
+        clearLocalDataBtn.setMinWidth(10);
         clearLocalDataBtn.setStyle(secondaryBtnStyle() + " -fx-background-color: #2E0000;");
 
         Label nukeStatus = statusLabel();
@@ -519,8 +634,24 @@ public class SettingsPanel extends VBox {
             ChangeText(clearLocalDataBtn, NUKE_IDLE_TEXT, false);
         });
 
+        Button devTurnOffManual = new Button("Turn off devmode");
+        devTurnOffManual.setMinWidth(10);
+        devTurnOffManual.setStyle(secondaryBtnStyle());
+        devTurnOffManual.setOnAction(e -> {
+            if (settings.devMode) {
+                settings.devMode = false;
+                settings.save();
+                ChangeText(devTurnOffManual, "toggled devMode off", false);
+            } else {
+
+                ChangeText(devTurnOffManual, "devMode is off", true);
+
+            }
+        });
+
         nukeRow.getChildren().addAll(clearLocalDataBtn, nukeStatus);
         panel.getChildren().add(nukeRow);
+        panel.getChildren().addAll(sectionLabel("devMode"), devTurnOffManual);
 
         return panel;
     }

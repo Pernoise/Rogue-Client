@@ -23,7 +23,7 @@ public class AuthPanel extends VBox {
         setStyle("-fx-background-color: " + ThemedStyles.panelBg() + ";");
 
         Label title = new Label("Accounts");
-        title.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 16; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-weight: bold;");
+        title.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 25; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-font-weight: bold;");
 
         Button msTab  = new Button("Microsoft");
         Button elyTab = new Button("Ely.by");

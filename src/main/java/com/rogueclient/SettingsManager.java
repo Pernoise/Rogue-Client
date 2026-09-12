@@ -19,6 +19,7 @@ public class SettingsManager {
     public boolean discordRpc    = true;
     public boolean enableTray       = true;
     public boolean launchOnStartup  = false;
+    public boolean devMode = false;
 
     public SettingsManager() {}
 
@@ -35,6 +36,7 @@ public class SettingsManager {
                 if (obj.has("discordRpc"))    this.discordRpc    = obj.get("discordRpc").getAsBoolean();
                 if (obj.has("enableTray"))      this.enableTray      = obj.get("enableTray").getAsBoolean();
                 if (obj.has("launchOnStartup")) this.launchOnStartup = obj.get("launchOnStartup").getAsBoolean();
+                if (obj.has("devMode")) this.devMode = obj.get("devMode").getAsBoolean();
             }
         } catch (Exception e) {
             System.out.println("Could not load settings: " + e.getMessage());
@@ -53,6 +55,7 @@ public class SettingsManager {
             obj.addProperty("discordRpc",    discordRpc);
             obj.addProperty("enableTray",      enableTray);
             obj.addProperty("launchOnStartup", launchOnStartup);
+            obj.addProperty("devMode", devMode);
             Files.write(SETTINGS_FILE, GSON.toJson(obj).getBytes());
         } catch (Exception e) {
             System.out.println("Could not save settings: " + e.getMessage());
