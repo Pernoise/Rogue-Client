@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
@@ -319,9 +320,9 @@ public class SettingsPanel extends VBox {
         panel.getChildren().add(javaArgsField);
 
         int systemMax = SettingsManager.getSystemMaxRamMb();
-        Label ramLabel = new Label(settings.ramMb + " MB");
-        ramLabel.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "';");
-
+        TextField ramInput = new TextField(settings.ramMb + " MB");
+        ramInput.setStyle("-fx-text-fill: " + ThemedStyles.text() + "; -fx-font-size: 11; -fx-font-family: '" + ThemedStyles.font() + "'; -fx-background-color:" + ThemedStyles.btnBg() + ";");
+        ramInput.setMaxWidth(100);
         panel.getChildren().add(sectionLabel("RAM Allocation (System max: " + systemMax + " MB)"));
         Slider ramSlider = new Slider(512, systemMax, settings.ramMb);
         ramSlider.setBlockIncrement(512);
@@ -329,12 +330,50 @@ public class SettingsPanel extends VBox {
         ramSlider.getStyleClass().add("rocket-slider");
         ramSlider.setMaxWidth(Double.MAX_VALUE);
         ramSlider.valueProperty().addListener((obs, o, n) -> {
-            int val = (n.intValue() / 512) * 512;
-            ramLabel.setText(val + " MB");
-            settings.ramMb = val;
-            settings.save();
+            if (!ramInput.isFocused()) {
+                try {
+                    int val = (n.intValue() / 512) * 512;
+                    ramInput.setText(val + " MB");
+                    settings.ramMb = val;
+                    settings.save();
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+            }
         });
-        panel.getChildren().addAll(ramSlider, ramLabel);
+        ramInput.textProperty().addListener((obs, o, n) -> {
+            if (!(Objects.equals(n, "")) && !ramSlider.isFocused()) {
+                int val = (Integer.valueOf(n.replaceAll("\\D+", "")) / 512) * 512;
+                if (!(val < 512)) {
+                    ramSlider.setValue(val);
+                    settings.ramMb = val;
+                } else {
+                    ramSlider.setValue(512);
+                    settings.ramMb = 512;
+                }
+            }
+
+        });
+        ramInput.focusedProperty().addListener((obs, o, n) -> {
+            if (!n) {
+                try {
+                    int val = (Integer.valueOf(ramInput.getText().replaceAll("\\D+", "")) / 512) * 512;
+                    if (val < 512) {
+                        val = 512;
+                    }
+                    ramInput.setText(val + " MB");
+                    ramSlider.setValue(val);
+                    settings.ramMb = val;
+                    settings.save();
+                } catch (NumberFormatException e) {
+                    ramInput.setText("512 MB");
+                    ramSlider.setValue(512);
+                    settings.ramMb = 512;
+                    settings.save();
+                }
+            }
+        });
+        panel.getChildren().addAll(ramSlider, ramInput);
 
         panel.getChildren().add(sectionLabel("Launcher Behaviour"));
         HBox hideRow = toggleRow("Hide launcher when Minecraft launches", settings.hideLauncher, val -> {
