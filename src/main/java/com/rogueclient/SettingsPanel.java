@@ -22,7 +22,6 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -135,7 +134,7 @@ public class SettingsPanel extends VBox {
             devToolsTab.setVisible(false);
         }
         //loads the devtoggle images
-        devToggleAnim_[0] = new Image(getClass().getResourceAsStream("/images/devScrewSprites/0000.png"));
+        devToggleAnim_[0] = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/devScrewSprites/0000.png")));
         devSpriteCollectionThread();
         tabBar.setViewOrder(-1);
         getChildren().addAll(titleLabel, tabBar, content);
@@ -337,13 +336,13 @@ public class SettingsPanel extends VBox {
                     settings.ramMb = val;
                     settings.save();
                 } catch (Exception e) {
-                    System.out.println(e);
+                    throw new RuntimeException(e);
                 }
             }
         });
         ramInput.textProperty().addListener((obs, o, n) -> {
             if (!(Objects.equals(n, "")) && !ramSlider.isFocused()) {
-                int val = (Integer.valueOf(n.replaceAll("\\D+", "")) / 512) * 512;
+                int val = (Integer.parseInt(n.replaceAll("\\D+", "")) / 512) * 512;
                 if (!(val < 512)) {
                     ramSlider.setValue(val);
                     settings.ramMb = val;
@@ -357,7 +356,7 @@ public class SettingsPanel extends VBox {
         ramInput.focusedProperty().addListener((obs, o, n) -> {
             if (!n) {
                 try {
-                    int val = (Integer.valueOf(ramInput.getText().replaceAll("\\D+", "")) / 512) * 512;
+                    int val = (Integer.parseInt(ramInput.getText().replaceAll("\\D+", "")) / 512) * 512;
                     if (val < 512) {
                         val = 512;
                     }
