@@ -92,7 +92,9 @@ public class NewsPanel extends VBox {
             newsCard("17/05/2026", "Splash screen on launch."),
             newsCard("17/05/2026", "Account switcher with logout support."),
             newsCard("17/05/2026", "Version selector 1.19 to 26.1.2."),
-            newsCard("17/05/2026", "Java path override in settings.")
+                newsCard("17/05/2026", "Java path override in settings."),
+                newsCard("14/9/2026", "Added a new screwdriver graphic to the settings panel. The devtools menu is now hidden on default."),
+                newsCard("16/09/2026", "Turned the RAM Value text into an input field for more specificity.")
         );
     }
 
